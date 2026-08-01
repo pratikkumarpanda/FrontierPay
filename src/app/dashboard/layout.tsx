@@ -131,7 +131,7 @@ export default function DashboardLayout({
           <TopBar />
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto bg-grid relative z-10 no-scrollbar p-10">
+          <main className="flex-1 overflow-y-auto bg-grid relative z-10 no-scrollbar p-10 pt-[120px]">
             {children}
           </main>
         </div>

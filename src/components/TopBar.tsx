@@ -39,7 +39,7 @@ export default function TopBar() {
   ];
 
   return (
-    <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 lg:px-10 z-40 sticky top-0 flex-shrink-0">
+    <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 lg:px-10 z-40 absolute top-0 left-0 right-0 flex-shrink-0">
         
         {/* Global Search */}
         <div className="flex-1 max-w-xl" ref={searchRef}>
