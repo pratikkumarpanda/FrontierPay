@@ -77,7 +77,7 @@ export default function ImportPaymentWizard() {
       amount: -invoiceVal,
       currency: 'USD',
       status: 'Processing',
-      type: 'Outbound'
+      type: 'Import'
     });
     
     setIsSuccess(true);
