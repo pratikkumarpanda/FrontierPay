@@ -27,10 +27,13 @@ jobs:
           node-version: "20"
           cache: npm
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (production — applies basePath & static export)
+      - name: Build
         run: npm run build
         env:
           NODE_ENV: production
