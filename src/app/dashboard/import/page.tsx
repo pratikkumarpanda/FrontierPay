@@ -1,314 +1,475 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMock, NETWORK_FEE_USD } from '@/lib/MockContext';
-import { FileText, ArrowRight, CheckCircle2, AlertTriangle, Upload, UserPlus } from 'lucide-react';
-import Modal from '@/components/Modal';
+import { ArrowRight, CheckCircle2, Upload, Search, Building2, ShieldCheck, Clock } from 'lucide-react';
 
-const PURPOSE_CODES = {
-  "Trade & Goods": [
-    "P0103 - Advance for Imports",
-    "P0104 - Payment for Imports"
-  ],
-  "Services & Intangibles": [
-    "S0102 - Trade in Services",
-    "S0802 - Software License",
-    "S1011 - Consultancy Fees",
-    "S1014 - Engineering Services"
-  ]
-};
+export default function ImportPaymentWizard() {
+  const { balances, addBalance, addTransaction, addToast, fxRates, counterparties } = useMock();
+  const [currentStep, setCurrentStep] = useState(1);
 
-const COUNTRIES = [
-  { code: 'US', name: 'United States' },
-  { code: 'SG', name: 'Singapore' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'EU', name: 'European Union' },
-  { code: 'IN', name: 'India' }
-];
-
-export default function ImportPaymentsPage() {
-  const { counterparties, balances, fxRates, deductBalance, addTransaction, addToast, tier, markupMultiplier } = useMock();
+  // Step 1: Beneficiary
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBene, setSelectedBene] = useState<any>(null);
   
-  const [activeModal, setActiveModal] = useState<'initiate' | null>(null);
-  
-  // Form State
-  const [vendorName, setVendorName] = useState(counterparties[0]?.name || '');
-  const [newVendorAccount, setNewVendorAccount] = useState('');
-  const [newVendorCountry, setNewVendorCountry] = useState('US');
-  
+  // Step 2: Payment
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState('USD');
-  const [invoiceRef, setInvoiceRef] = useState('');
-  const [attachedFile, setAttachedFile] = useState<File | null>(null);
-  
-  // Compliance State
-  const [hasTRC, setHasTRC] = useState(true);
-  const [has15CB, setHas15CB] = useState(true);
-
-  // Derived State
-  const isExistingVendor = counterparties.some(c => c.name === vendorName);
+  const markupMultiplier = 1.002; // 0.2% markup for demo
   const invoiceVal = parseFloat(amount) || 0;
-  
-  // Cross Rate Calculation
-  const currencyRateToUSD = fxRates[currency] || 1; 
-  const usdEquivalent = invoiceVal / currencyRateToUSD;
-  const inrBaseCost = usdEquivalent * (fxRates['INR'] || 83.5);
+  const inrBaseCost = invoiceVal * (fxRates['INR'] || 83.5);
   const networkFeeInr = NETWORK_FEE_USD * (fxRates['INR'] || 83.5);
   const totalInrToDebit = (inrBaseCost + networkFeeInr) * markupMultiplier;
 
+  // Step 3: Compliance
+  const [purposeCode, setPurposeCode] = useState('P0103 - Advance for Imports');
+  const [invoiceRef, setInvoiceRef] = useState('');
+  const [fileAttached, setFileAttached] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanStep, setScanStep] = useState(0);
 
-  const handleInitiate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (invoiceVal <= 0) return;
-    
-    if (balances.INR < totalInrToDebit) {
-      return addToast('Failed', `Insufficient INR balance. You need ₹${totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 2 })} to clear this invoice.`, 'error');
+  // Success Screen
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const filteredCounterparties = counterparties.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.country.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFileAttached(true);
     }
-
-    setIsScanning(true);
-    setScanStep(1);
-    await new Promise(r => setTimeout(r, 800)); // OFAC
-    setScanStep(2);
-    await new Promise(r => setTimeout(r, 800)); // IBAN
-    setScanStep(3);
-    await new Promise(r => setTimeout(r, 800)); // OCR
-    setScanStep(4);
-    await new Promise(r => setTimeout(r, 400)); // Done
-
-    deductBalance('INR', totalInrToDebit);
-    addTransaction({ 
-      id: `TRX-${Math.floor(Math.random()*10000)}`, 
-      type: 'Import', 
-      amount: invoiceVal, 
-      currency: currency, 
-      status: 'Processing', 
-      date: 'Just now' 
-    });
-    addToast('Payment Initiated', `Invoice ${invoiceRef} scheduled for T+0 settlement.`, 'success');
-    setActiveModal(null);
-    setAmount('');
-    setInvoiceRef('');
-    setAttachedFile(null);
-    setIsScanning(false);
-    setScanStep(0);
   };
 
-  return (
-    <div className="animate-fade-in">
-      <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Import Payments (A1)</h1>
-          <p className="text-muted">Automated DTAA & Form 15CA/CB compliance for outward remittances.</p>
+  const startRiskScan = () => {
+    if (!invoiceVal || !selectedBene || !fileAttached) {
+      addToast('Missing Info', 'Please attach required documents and ensure amount is filled.', 'error');
+      return;
+    }
+    
+    setIsScanning(true);
+    setScanStep(0);
+    
+    setTimeout(() => setScanStep(1), 800); // OFAC Check
+    setTimeout(() => setScanStep(2), 1600); // IBAN Validation
+    setTimeout(() => {
+      setScanStep(3); // OCR Match
+      setIsScanning(false);
+      setCurrentStep(4); // Move to Review
+    }, 2500);
+  };
+
+  const handleConfirmPay = () => {
+    const inrBalance = balances.find(b => b.currency === 'INR')?.amount || 0;
+    
+    if (inrBalance < totalInrToDebit) {
+      addToast('Insufficient INR Balance', `You need ₹${totalInrToDebit.toLocaleString()} to settle this transaction.`, 'error');
+      return;
+    }
+    
+    // Deduct INR
+    addBalance('INR', -totalInrToDebit);
+    
+    // Add Transaction record
+    addTransaction({
+      id: `TX-${Math.floor(Math.random() * 10000)}`,
+      date: new Date().toISOString().split('T')[0],
+      description: `Import Payment to ${selectedBene.name}`,
+      amount: -invoiceVal,
+      currency: 'USD',
+      status: 'Processing',
+      type: 'Outbound'
+    });
+    
+    setIsSuccess(true);
+  };
+
+  // Helper styles for stepper
+  const getStepClass = (step: number) => {
+    if (currentStep > step) return { bg: '#10b981', text: 'white', border: '#10b981' }; // Completed (Green)
+    if (currentStep === step) return { bg: 'var(--primary-blue)', text: 'white', border: 'var(--primary-blue)', shadow: '0 0 0 4px rgba(14,165,233,0.2)' }; // Active
+    return { bg: 'white', text: 'var(--text-muted)', border: 'var(--border-glass-solid)' }; // Inactive
+  };
+
+  const progressWidth = ((currentStep - 1) / 3) * 100;
+
+  if (isSuccess) {
+    return (
+      <div className="animate-fade-in flex flex-col items-center justify-center py-20">
+        <div style={{ width: '80px', height: '80px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', border: '1px solid #a7f3d0' }}>
+          <CheckCircle2 size={40} style={{ color: '#10b981' }} />
         </div>
-        <button onClick={() => setActiveModal('initiate')} className="btn btn-primary">
-          Initiate Payment <ArrowRight size={16} />
-        </button>
+        <h2 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px' }}>Transfer Initiated!</h2>
+        <p className="text-muted" style={{ fontSize: '18px', marginBottom: '32px' }}>Transaction ID: <span style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--primary-blue)' }}>#OUT-{Math.floor(Math.random() * 10000)}</span></p>
+        
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <button onClick={() => window.location.href='/dashboard'} className="btn" style={{ background: 'white', color: 'var(--text-primary)', border: '1px solid var(--border-glass-solid)' }}>Return to Dashboard</button>
+          <button onClick={() => window.location.href='/dashboard/transactions'} className="btn btn-primary">Track Status</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in" style={{ paddingBottom: '100px' }}>
+      
+      {/* Header */}
+      <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ color: 'var(--primary-blue)' }}><ArrowRight size={24} /></span> New Outflow Transfer
+          </h1>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <p style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Available INR Balance</p>
+          <p style={{ fontSize: '18px', fontWeight: 700, fontFamily: 'monospace' }}>
+            ₹ {(balances.find(b => b.currency === 'INR')?.amount || 0).toLocaleString()}
+          </p>
+        </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px' }}>
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>Pending Documentation</h3>
-          <div style={{ fontSize: '24px', fontWeight: 600 }}>0 <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--primary-green)' }}>Clear</span></div>
-        </div>
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>Average Settlement Time</h3>
-          <div style={{ fontSize: '24px', fontWeight: 600 }}>45 mins <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>T+0</span></div>
-        </div>
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '8px' }}>Active Markup Tier</h3>
-          <div style={{ fontSize: '24px', fontWeight: 600 }}>{((markupMultiplier - 1) * 100).toFixed(2)}% <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>{tier}</span></div>
+      {/* Stepper */}
+      <div style={{ maxWidth: '800px', margin: '0 auto 48px auto', position: 'relative' }}>
+        {/* Connecting Line */}
+        <div style={{ position: 'absolute', top: '50%', left: '0', width: '100%', height: '2px', background: 'var(--border-glass-solid)', zIndex: 0, transform: 'translateY(-50%)' }} />
+        {/* Active Line */}
+        <div style={{ position: 'absolute', top: '50%', left: '0', width: `${progressWidth}%`, height: '2px', background: 'var(--primary-blue)', zIndex: 0, transform: 'translateY(-50%)', transition: 'width 0.3s ease' }} />
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', zIndex: 10 }}>
+          {['Beneficiary', 'Payment', 'Compliance', 'Review'].map((label, i) => {
+            const step = i + 1;
+            const styles = getStepClass(step);
+            return (
+              <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', cursor: currentStep > step ? 'pointer' : 'default' }} onClick={() => currentStep > step && setCurrentStep(step)}>
+                <div style={{ 
+                  width: '40px', height: '40px', borderRadius: '50%', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  background: styles.bg, color: styles.text, border: `2px solid ${styles.border}`,
+                  boxShadow: styles.shadow || 'none', fontWeight: 600, transition: 'all 0.3s ease'
+                }}>
+                  {currentStep > step ? <CheckCircle2 size={20} /> : step}
+                </div>
+                <p style={{ fontSize: '12px', fontWeight: currentStep === step ? 700 : 500, color: currentStep >= step ? 'var(--text-primary)' : 'var(--text-muted)' }}>{label}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding: '32px', textAlign: 'center', minHeight: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <FileText size={48} color="var(--border-glass-solid)" style={{ marginBottom: '16px' }} />
-        <h3 style={{ fontSize: '18px', fontWeight: 500, marginBottom: '8px' }}>No pending invoices</h3>
-        <p className="text-muted" style={{ marginBottom: '24px' }}>Upload your vendor invoices or connect your ERP to automate imports.</p>
-        <button onClick={() => setActiveModal('initiate')} className="btn btn-secondary">Create Manual Payment</button>
-      </div>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        
+        {/* STEP 1: BENEFICIARY */}
+        {currentStep === 1 && (
+          <div className="glass-panel" style={{ padding: '32px', animation: 'fadeIn 0.3s ease' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 700 }}>Who are you paying?</h3>
+              <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
+                <button style={{ padding: '4px 12px', fontSize: '12px', fontWeight: 600, background: 'white', color: 'var(--primary-blue)', borderRadius: '4px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>Saved</button>
+                <button style={{ padding: '4px 12px', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>New</button>
+              </div>
+            </div>
 
-      <Modal isOpen={activeModal === 'initiate'} onClose={() => setActiveModal(null)} title="Initiate Import Payment" width="700px">
-        <form onSubmit={handleInitiate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          
-          {/* Section 1: Beneficiary */}
-          <div style={{ padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <UserPlus size={16} className="text-blue" /> Beneficiary Details
-            </h4>
-            <div className="form-group mb-4">
-              <label className="form-label">Beneficiary Name (Select existing or type new)</label>
+            <div style={{ position: 'relative', marginBottom: '24px' }}>
+              <Search size={18} style={{ position: 'absolute', left: '16px', top: '14px', color: 'var(--text-muted)' }} />
               <input 
                 type="text" 
-                list="vendor-list" 
-                className="form-input" 
-                value={vendorName} 
-                onChange={e => setVendorName(e.target.value)} 
-                required 
-                placeholder="Start typing..."
+                placeholder="Search saved partners by name, country, or IBAN..." 
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '12px', border: '1px solid var(--border-glass-solid)', background: '#f8fafc', fontSize: '14px' }} 
               />
-              <datalist id="vendor-list">
-                {counterparties.map(cp => (
-                  <option key={cp.id} value={cp.name} />
-                ))}
-              </datalist>
             </div>
 
-            {!isExistingVendor && vendorName.length > 0 && (
-              <div className="animate-fade-in flex gap-4 mt-4 pt-4" style={{ borderTop: '1px dashed var(--border-glass-solid)' }}>
-                <div className="form-group" style={{ flex: 2 }}>
-                  <label className="form-label">Account Number / IBAN</label>
-                  <input type="text" className="form-input" value={newVendorAccount} onChange={e => setNewVendorAccount(e.target.value)} required placeholder="Required for new vendor" />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Country</label>
-                  <select className="form-select" value={newVendorCountry} onChange={e => setNewVendorCountry(e.target.value)} required>
-                    {COUNTRIES.map(c => (
-                      <option key={c.code} value={c.code}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Section 2: Invoice & Payment Type */}
-          <div className="flex gap-4">
-            <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Purpose Code</label>
-              <select className="form-select" required>
-                {Object.entries(PURPOSE_CODES).map(([group, codes]) => (
-                  <optgroup key={group} label={group}>
-                    {codes.map(code => <option key={code} value={code}>{code}</option>)}
-                  </optgroup>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Invoice Amount</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <select className="form-select" style={{ width: '100px' }} value={currency} onChange={e => setCurrency(e.target.value)}>
-                  {Object.keys(balances).filter(c => c !== 'INR').map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-                <input type="number" className="form-input" style={{ flex: 1 }} placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} required />
-              </div>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Invoice Reference</label>
-              <input type="text" className="form-input" placeholder="INV-2026-001" value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} required />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Attach Documents (Invoice, Waybill)</label>
-            <div style={{ position: 'relative', border: '1px dashed var(--border-glass-solid)', borderRadius: '8px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.01)', cursor: 'pointer' }}>
-              <input 
-                type="file" 
-                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} 
-                onChange={(e) => setAttachedFile(e.target.files?.[0] || null)} 
-              />
-              {attachedFile ? (
-                <>
-                  <div style={{ width: '36px', height: '36px', background: '#dcfce7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <CheckCircle2 size={18} className="text-green-600" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+              {filteredCounterparties.map(c => (
+                <div 
+                  key={c.name}
+                  onClick={() => setSelectedBene(c)}
+                  style={{ 
+                    padding: '16px', 
+                    borderRadius: '12px', 
+                    border: `2px solid ${selectedBene?.name === c.name ? 'var(--primary-blue)' : 'var(--border-glass-solid)'}`,
+                    background: 'white',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: selectedBene?.name === c.name ? '0 0 0 4px rgba(14,165,233,0.1)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--text-muted)' }}>
+                      {c.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: 600 }}>{c.name}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.country}</div>
+                    </div>
                   </div>
-                  <div>
-                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>{attachedFile.name}</p>
-                    <p style={{ fontSize: '12px', color: '#16a34a', fontWeight: 500 }}>Ready for compliance scan</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Last: Never</span>
+                    {selectedBene?.name === c.name ? (
+                      <CheckCircle2 size={16} style={{ color: 'var(--primary-blue)' }} />
+                    ) : (
+                      <div style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid var(--border-glass-solid)' }} />
+                    )}
                   </div>
-                </>
-              ) : (
-                <>
-                  <Upload size={16} className="text-muted" />
-                  <span className="text-muted" style={{ fontSize: '13px' }}>Click to upload files or drag and drop</span>
-                </>
-              )}
-            </div>
-          </div>
-          
-          {/* Section 3: Tax Engine */}
-          <div style={{ padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Withholding Tax & Compliance</h4>
-            
-            <div className="flex items-center justify-between mb-3">
-              <span style={{ fontSize: '13px' }}>Valid Tax Residency Certificate (TRC) & Form 10F on file?</span>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setHasTRC(true)} className={`badge ${hasTRC ? 'badge-blue' : 'text-muted'}`} style={{ cursor: 'pointer', border: hasTRC ? 'none' : '1px solid #e2e8f0' }}>Yes</button>
-                <button type="button" onClick={() => setHasTRC(false)} className={`badge ${!hasTRC ? 'badge-yellow' : 'text-muted'}`} style={{ cursor: 'pointer', border: !hasTRC ? 'none' : '1px solid #e2e8f0' }}>No</button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <span style={{ fontSize: '13px' }}>Form 15CB (CA Certificate) uploaded?</span>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setHas15CB(true)} className={`badge ${has15CB ? 'badge-blue' : 'text-muted'}`} style={{ cursor: 'pointer', border: has15CB ? 'none' : '1px solid #e2e8f0' }}>Yes</button>
-                <button type="button" onClick={() => setHas15CB(false)} className={`badge ${!has15CB ? 'badge-yellow' : 'text-muted'}`} style={{ cursor: 'pointer', border: !has15CB ? 'none' : '1px solid #e2e8f0' }}>No</button>
-              </div>
-            </div>
-
-            {hasTRC && has15CB ? (
-               <div className="flex items-center gap-2 text-green" style={{ fontSize: '12px', fontWeight: 500, padding: '10px', background: '#f0fdf4', borderRadius: '6px' }}>
-                 <CheckCircle2 size={14} /> DTAA Benefit Claimed (Treaty Rates Apply) & RBI requirements satisfied.
-               </div>
-            ) : (
-               <div className="flex items-center gap-2 text-amber-600" style={{ fontSize: '12px', fontWeight: 500, padding: '10px', background: '#fffbeb', borderRadius: '6px' }}>
-                 <AlertTriangle size={14} /> Domestic IT Act Rates & Surcharge Apply. Missing documentation.
-               </div>
-            )}
-          </div>
-
-          {/* Pricing Preview */}
-          <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-            <div className="flex justify-between items-center mb-1">
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Cross Rate ({currency}/INR)</span>
-              <span style={{ fontSize: '14px', fontWeight: 500 }}>
-                {currencyRateToUSD ? ( (1/currencyRateToUSD) * (fxRates['INR'] || 83.5) ).toFixed(4) : '0.0000'} INR
-              </span>
-            </div>
-            <div className="flex justify-between items-center mb-1">
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Spread ({tier})</span>
-              <span style={{ fontSize: '14px', fontWeight: 500 }}>{((markupMultiplier - 1) * 100).toFixed(2)}%</span>
-            </div>
-            <div className="flex justify-between items-center mb-2">
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Network Wire Fee</span>
-              <span style={{ fontSize: '14px', fontWeight: 500 }}>${NETWORK_FEE_USD.toFixed(2)} (₹{networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
-            </div>
-            <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--border-glass-solid)' }}>
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Total Cost to debit</span>
-              <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--primary-blue)' }}>
-                {amount ? `₹${totalInrToDebit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '₹0.00'}
-              </span>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '4px' }}>
-            {isScanning ? (
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', fontWeight: 600 }}>
-                  <span className="text-slate-700">Compliance Shield Active</span>
-                  <span className="text-blue">{scanStep === 1 ? 'OFAC Sanctions Scan...' : scanStep === 2 ? 'IBAN Validation...' : scanStep === 3 ? 'OCR Invoice Match...' : 'Cleared for Settlement'}</span>
                 </div>
-                <div style={{ width: '100%', background: '#e2e8f0', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{ 
-                    height: '100%', 
-                    background: 'var(--primary-blue)', 
-                    width: `${(scanStep / 4) * 100}%`,
-                    transition: 'width 0.8s ease'
-                  }} />
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => setCurrentStep(2)} 
+                disabled={!selectedBene}
+                className="btn btn-primary" 
+                style={{ padding: '12px 32px', opacity: selectedBene ? 1 : 0.5 }}
+              >
+                Continue <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 2: PAYMENT DETAILS */}
+        {currentStep === 2 && (
+          <div className="glass-panel" style={{ padding: '32px', animation: 'fadeIn 0.3s ease' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 700 }}>How much?</h3>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Live Rate (USD/INR)</p>
+                <p style={{ fontSize: '18px', fontWeight: 700, fontFamily: 'monospace' }}>{(fxRates['INR'] || 83.5).toFixed(2)} <span style={{ color: '#10b981', fontSize: '12px', background: '#ecfdf5', padding: '2px 6px', borderRadius: '4px' }}>+0.05%</span></p>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
+              {/* Left Column */}
+              <div>
+                <div style={{ background: 'white', border: '1px solid var(--border-glass-solid)', borderRadius: '16px', padding: '24px', marginBottom: '24px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                     <span>You Send (USD)</span>
+                   </div>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                     <span style={{ fontSize: '24px', color: 'var(--text-muted)', fontWeight: 300 }}>$</span>
+                     <input 
+                        type="number"
+                        value={amount}
+                        onChange={e => setAmount(e.target.value)}
+                        placeholder="0.00"
+                        style={{ border: 'none', background: 'transparent', fontSize: '36px', fontWeight: 700, width: '100%', outline: 'none' }}
+                     />
+                   </div>
+                </div>
+
+                <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '16px', border: '1px solid var(--border-glass-solid)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '12px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Wholesale Rate</span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{(fxRates['INR'] || 83.5).toFixed(2)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '12px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Platform Fee (0.20%)</span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>₹ {((inrBaseCost * 0.002)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '12px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Network Wire Fee</span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>${NETWORK_FEE_USD.toFixed(2)} (₹ {networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
+                  </div>
+                  <div style={{ height: '1px', background: 'var(--border-glass-solid)', margin: '12px 0' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px' }}>
+                    <span style={{ fontWeight: 700 }}>Total INR to Debit</span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary-blue)' }}>
+                      ₹ {invoiceVal ? totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            ) : (
-              <button type="submit" className="btn btn-primary w-full" disabled={isScanning}>Initiate Payment</button>
-            )}
-          </div>
-        </form>
-      </Modal>
 
+              {/* Right Column */}
+              <div>
+                <div style={{ background: 'white', borderRadius: '16px', padding: '16px', border: '1px solid var(--border-glass-solid)', height: '100%' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                     <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Rate Trend (24h)</h4>
+                     <span style={{ fontSize: '10px', color: '#10b981', background: '#ecfdf5', padding: '4px 8px', borderRadius: '12px', fontWeight: 700 }}>Low Volatility</span>
+                  </div>
+                  <div style={{ height: '150px', background: '#f8fafc', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '12px', border: '1px dashed var(--border-glass-solid)' }}>
+                     [Chart Rendering]
+                  </div>
+                  <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                    <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}><Clock size={12} style={{ display: 'inline', marginRight: '4px' }}/>Rate is locked for 60 mins upon confirmation.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button onClick={() => setCurrentStep(1)} className="btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)' }}>Back</button>
+              <button onClick={() => setCurrentStep(3)} disabled={!invoiceVal} className="btn btn-primary" style={{ padding: '12px 32px', opacity: invoiceVal ? 1 : 0.5 }}>
+                Continue <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: COMPLIANCE SHIELD */}
+        {currentStep === 3 && (
+          <div className="glass-panel" style={{ padding: '32px', animation: 'fadeIn 0.3s ease' }}>
+             <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '24px' }}>Compliance Shield</h3>
+
+             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
+               {/* Inputs */}
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div className="form-group">
+                    <label className="form-label">Purpose of Payment (FEMA)</label>
+                    <select className="form-select" value={purposeCode} onChange={e => setPurposeCode(e.target.value)}>
+                      <option>P0103 - Advance for Imports</option>
+                      <option>P0102 - Settlement of Imports</option>
+                      <option>S1107 - Software Consultancy</option>
+                      <option>P0807 - Royalties & License Fees</option>
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label">Invoice Reference</label>
+                    <input type="text" className="form-input" value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} placeholder="INV-2026-..." />
+                  </div>
+
+                  <div 
+                    style={{ 
+                      border: '2px dashed var(--primary-blue)', 
+                      background: '#f0f9ff',
+                      borderRadius: '16px', 
+                      padding: '32px', 
+                      textAlign: 'center',
+                      position: 'relative',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <input type="file" onChange={handleFileUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                    {!fileAttached ? (
+                      <>
+                        <div style={{ width: '48px', height: '48px', background: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
+                          <Upload size={20} style={{ color: 'var(--primary-blue)' }} />
+                        </div>
+                        <p style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Upload Invoice / Bill of Entry</p>
+                        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>PDF, JPG (Max 5MB)</p>
+                      </>
+                    ) : (
+                      <>
+                        <div style={{ width: '48px', height: '48px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
+                          <CheckCircle2 size={20} style={{ color: '#10b981' }} />
+                        </div>
+                        <p style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{invoiceRef || 'Invoice'}.pdf</p>
+                        <p style={{ fontSize: '12px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>Ready for scan</p>
+                      </>
+                    )}
+                  </div>
+               </div>
+
+               {/* Risk Scan Simulator */}
+               <div style={{ background: '#f8fafc', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-glass-solid)' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '24px' }}>Real-time Risk Scan</h4>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {/* OFAC */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>OFAC / Sanctions Check</span>
+                        <span style={{ color: scanStep >= 1 ? '#10b981' : 'var(--text-muted)' }}>{scanStep >= 1 ? 'Passed' : 'Pending'}</span>
+                      </div>
+                      <div style={{ width: '100%', height: '6px', background: 'var(--border-glass-solid)', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', background: '#10b981', width: scanStep >= 1 ? '100%' : (isScanning ? '50%' : '0%'), transition: 'width 0.8s ease' }} />
+                      </div>
+                    </div>
+                    {/* IBAN */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Beneficiary Bank Validation</span>
+                        <span style={{ color: scanStep >= 2 ? '#10b981' : 'var(--text-muted)' }}>{scanStep >= 2 ? 'Passed' : 'Pending'}</span>
+                      </div>
+                      <div style={{ width: '100%', height: '6px', background: 'var(--border-glass-solid)', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', background: '#10b981', width: scanStep >= 2 ? '100%' : (isScanning && scanStep >= 1 ? '50%' : '0%'), transition: 'width 0.8s ease' }} />
+                      </div>
+                    </div>
+                    {/* OCR */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Invoice OCR Match</span>
+                        <span style={{ color: scanStep >= 3 ? '#10b981' : 'var(--text-muted)' }}>{scanStep >= 3 ? 'Passed' : 'Pending'}</span>
+                      </div>
+                      <div style={{ width: '100%', height: '6px', background: 'var(--border-glass-solid)', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', background: '#10b981', width: scanStep >= 3 ? '100%' : (isScanning && scanStep >= 2 ? '50%' : '0%'), transition: 'width 0.8s ease' }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {scanStep >= 3 && (
+                    <div style={{ marginTop: '24px', padding: '12px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ShieldCheck size={16} style={{ color: '#10b981' }} />
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#047857' }}>All Checks Passed. Ready for execution.</span>
+                    </div>
+                  )}
+               </div>
+             </div>
+
+             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button onClick={() => setCurrentStep(2)} className="btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)' }}>Back</button>
+              <button onClick={startRiskScan} disabled={isScanning} className="btn btn-primary" style={{ padding: '12px 32px', background: '#0f172a' }}>
+                {isScanning ? 'Running Checks...' : 'Run Checks & Continue'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4: REVIEW */}
+        {currentStep === 4 && (
+          <div className="glass-panel" style={{ padding: '48px 32px', animation: 'fadeIn 0.3s ease' }}>
+             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+               <div style={{ width: '64px', height: '64px', background: '#f0f9ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', border: '1px solid #bae6fd' }}>
+                  <Building2 size={24} style={{ color: 'var(--primary-blue)' }} />
+               </div>
+               <h3 style={{ fontSize: '24px', fontWeight: 700 }}>Confirm Transfer</h3>
+               <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>Please review details carefully before authorizing.</p>
+             </div>
+
+             <div style={{ background: 'white', borderRadius: '16px', border: '1px solid var(--border-glass-solid)', overflow: 'hidden', marginBottom: '32px', maxWidth: '600px', margin: '0 auto 32px auto' }}>
+                <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-glass-solid)', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Amount to Debit</span>
+                  <span style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'monospace' }}>₹ {totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                </div>
+                <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>To</span>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontWeight: 700 }}>{selectedBene?.name}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{selectedBene?.account}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Bank</span>
+                    <span>{selectedBene?.country} Bank</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Fee Breakdown</span>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontFamily: 'monospace' }}>${NETWORK_FEE_USD.toFixed(2)} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(Fixed)</span></p>
+                      <p style={{ fontFamily: 'monospace' }}>0.20% <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(FX Margin)</span></p>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Value Date</span>
+                    <span style={{ fontWeight: 700 }}>T+0 (Today)</span>
+                  </div>
+                </div>
+             </div>
+
+             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+                <button onClick={() => setCurrentStep(3)} className="btn" style={{ background: 'white', border: '1px solid var(--border-glass-solid)', padding: '12px 32px' }}>Edit</button>
+                <button onClick={handleConfirmPay} className="btn btn-primary" style={{ background: '#10b981', padding: '12px 32px', width: '250px' }}>
+                  Confirm & Pay <CheckCircle2 size={16} style={{ marginLeft: '8px' }} />
+                </button>
+             </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
