@@ -83,6 +83,9 @@ export default function DashboardLayout({
                 <Link href="/dashboard/export" className={getLinkClass('/dashboard/export')}>
                   <ArrowLeftRight size={16} /> Export Receipts
                 </Link>
+                <Link href="/dashboard/financing" className={getLinkClass('/dashboard/financing')}>
+                  <CreditCard size={16} /> Trade Credit & Financing
+                </Link>
                 <Link href="/dashboard/calculator" className={getLinkClass('/dashboard/calculator')}>
                   <Calculator size={16} /> FX Calculator
                 </Link>

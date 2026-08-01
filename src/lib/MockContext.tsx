@@ -27,6 +27,17 @@ export type Balances = {
   GBP: number;
 };
 
+export type CreditLimits = {
+  invoiceFinancing: {
+    limit: number;
+    used: number;
+  };
+  payLater: {
+    limit: number;
+    used: number;
+  };
+};
+
 export type Card = {
   id: string;
   last4: string;
@@ -68,6 +79,7 @@ interface MockContextType {
   webhookLogs: WebhookLog[];
   tier: PricingTier;
   markupMultiplier: number;
+  creditLimits: CreditLimits;
   setTier: (tier: PricingTier) => void;
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
   deductBalance: (currency: keyof Balances, amount: number) => void;
@@ -78,6 +90,7 @@ interface MockContextType {
   addCounterparty: (cp: Omit<Counterparty, 'id'>) => void;
   addToast: (title: string, message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
+  useCredit: (type: 'invoiceFinancing' | 'payLater', amount: number) => void;
 }
 
 const MockContext = createContext<MockContextType | undefined>(undefined);
@@ -89,6 +102,11 @@ export function MockProvider({ children }: { children: ReactNode }) {
     SGD: 15000.00,
     EUR: 0,
     GBP: 0,
+  });
+
+  const [creditLimits, setCreditLimits] = useState<CreditLimits>({
+    invoiceFinancing: { limit: 500000, used: 125000 },
+    payLater: { limit: 250000, used: 0 }
   });
 
   const [tier, setTier] = useState<PricingTier>('Growth');
@@ -215,10 +233,20 @@ export function MockProvider({ children }: { children: ReactNode }) {
     setCounterparties(prev => [...prev, newCp]);
   };
 
+  const useCredit = (type: 'invoiceFinancing' | 'payLater', amount: number) => {
+    setCreditLimits(prev => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        used: prev[type].used + amount
+      }
+    }));
+  };
+
   return (
     <MockContext.Provider value={{ 
-      balances, transactions, cards, counterparties, fxRates, toasts, webhookLogs, tier, markupMultiplier, setTier, setTransactions,
-      deductBalance, addBalance, addTransaction, issueCard, toggleCardStatus, addCounterparty, addToast, removeToast
+      balances, transactions, cards, counterparties, fxRates, toasts, webhookLogs, tier, markupMultiplier, creditLimits, setTier, setTransactions,
+      deductBalance, addBalance, addTransaction, issueCard, toggleCardStatus, addCounterparty, addToast, removeToast, useCredit
     }}>
       {children}
     </MockContext.Provider>

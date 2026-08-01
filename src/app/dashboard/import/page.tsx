@@ -55,13 +55,26 @@ export default function ImportPaymentsPage() {
   const swiftFeeInr = SWIFT_FEE_USD * (fxRates['INR'] || 83.5);
   const totalInrToDebit = (inrBaseCost + swiftFeeInr) * markupMultiplier;
 
-  const handleInitiate = (e: React.FormEvent) => {
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanStep, setScanStep] = useState(0);
+
+  const handleInitiate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (invoiceVal <= 0) return;
     
     if (balances.INR < totalInrToDebit) {
       return addToast('Failed', `Insufficient INR balance. You need ₹${totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 2 })} to clear this invoice.`, 'error');
     }
+
+    setIsScanning(true);
+    setScanStep(1);
+    await new Promise(r => setTimeout(r, 800)); // OFAC
+    setScanStep(2);
+    await new Promise(r => setTimeout(r, 800)); // IBAN
+    setScanStep(3);
+    await new Promise(r => setTimeout(r, 800)); // OCR
+    setScanStep(4);
+    await new Promise(r => setTimeout(r, 400)); // Done
 
     deductBalance('INR', totalInrToDebit);
     addTransaction({ 
@@ -77,6 +90,8 @@ export default function ImportPaymentsPage() {
     setAmount('');
     setInvoiceRef('');
     setAttachedFile(null);
+    setIsScanning(false);
+    setScanStep(0);
   };
 
   return (
@@ -114,11 +129,11 @@ export default function ImportPaymentsPage() {
       </div>
 
       <Modal isOpen={activeModal === 'initiate'} onClose={() => setActiveModal(null)} title="Initiate Import Payment" width="700px">
-        <form onSubmit={handleInitiate} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <form onSubmit={handleInitiate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
           {/* Section 1: Beneficiary */}
-          <div style={{ padding: '16px', background: 'rgba(0,0,0,0.02)', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <UserPlus size={16} className="text-blue" /> Beneficiary Details
             </h4>
             <div className="form-group mb-4">
@@ -217,8 +232,8 @@ export default function ImportPaymentsPage() {
           </div>
           
           {/* Section 3: Tax Engine */}
-          <div style={{ padding: '16px', background: 'rgba(0,0,0,0.02)', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}>Withholding Tax & Compliance</h4>
+          <div style={{ padding: '12px', background: 'rgba(0,0,0,0.02)', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Withholding Tax & Compliance</h4>
             
             <div className="flex items-center justify-between mb-3">
               <span style={{ fontSize: '13px' }}>Valid Tax Residency Certificate (TRC) & Form 10F on file?</span>
@@ -248,18 +263,18 @@ export default function ImportPaymentsPage() {
           </div>
 
           {/* Pricing Preview */}
-          <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-            <div className="flex justify-between items-center mb-2">
+          <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
+            <div className="flex justify-between items-center mb-1">
               <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Cross Rate ({currency}/INR)</span>
               <span style={{ fontSize: '14px', fontWeight: 500 }}>
                 {currencyRateToUSD ? ( (1/currencyRateToUSD) * (fxRates['INR'] || 83.5) ).toFixed(4) : '0.0000'} INR
               </span>
             </div>
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-1">
               <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Spread ({tier})</span>
               <span style={{ fontSize: '14px', fontWeight: 500 }}>{((markupMultiplier - 1) * 100).toFixed(2)}%</span>
             </div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-2">
               <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>SWIFT Wire Fee</span>
               <span style={{ fontSize: '14px', fontWeight: 500 }}>${SWIFT_FEE_USD.toFixed(2)} (₹{swiftFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
             </div>
@@ -271,7 +286,26 @@ export default function ImportPaymentsPage() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary w-full">Initiate Payment</button>
+          <div style={{ marginTop: '4px' }}>
+            {isScanning ? (
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', fontWeight: 600 }}>
+                  <span className="text-slate-700">Compliance Shield Active</span>
+                  <span className="text-blue">{scanStep === 1 ? 'OFAC Sanctions Scan...' : scanStep === 2 ? 'IBAN Validation...' : scanStep === 3 ? 'OCR Invoice Match...' : 'Cleared for Settlement'}</span>
+                </div>
+                <div style={{ width: '100%', background: '#e2e8f0', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    height: '100%', 
+                    background: 'var(--primary-blue)', 
+                    width: `${(scanStep / 4) * 100}%`,
+                    transition: 'width 0.8s ease'
+                  }} />
+                </div>
+              </div>
+            ) : (
+              <button type="submit" className="btn btn-primary w-full" disabled={isScanning}>Initiate Payment</button>
+            )}
+          </div>
         </form>
       </Modal>
 
