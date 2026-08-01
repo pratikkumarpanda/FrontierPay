@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useMock, Transaction } from '@/lib/MockContext';
-import { Download, Filter, CheckCircle2, Clock, Check, Building2, Globe2 } from 'lucide-react';
+import { Download, Filter, CheckCircle2, Clock, Check, Building2, Globe2, ArrowRightLeft } from 'lucide-react';
 import Modal from '@/components/Modal';
 
 export default function TransactionsPage() {
@@ -34,14 +34,23 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="animate-fade-in">
-      <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className="animate-fade-in max-w-6xl mx-auto">
+      <header className="mb-8 flex justify-between items-start">
         <div>
-          <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Global Transactions</h1>
-          <p className="text-muted">Complete audit trail of all inbound and outbound money movement.</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2 flex items-center gap-3">
+            <span className="text-brand-500"><ArrowRightLeft className="w-6 h-6" /></span>
+            Global Transactions
+          </h1>
+          <p className="text-sm text-slate-500">Complete audit trail of all inbound and outbound money movement.</p>
         </div>
         <div className="flex gap-4">
-          <button type="button" onClick={() => addToast('Not Implemented', 'Advanced filtering will be available soon.', 'info')} className="btn btn-secondary"><Filter size={16} /> Filter</button>
+          <button 
+            type="button" 
+            onClick={() => addToast('Not Implemented', 'Advanced filtering will be available soon.', 'info')} 
+            className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 font-medium rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors"
+          >
+            <Filter className="w-4 h-4" /> Filter
+          </button>
           <button 
             onClick={() => {
               addToast('Exporting...', 'CSV download will begin shortly.', 'info');
@@ -57,136 +66,121 @@ export default function TransactionsPage() {
               link.click();
               document.body.removeChild(link);
             }} 
-            className="btn btn-primary"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white font-medium rounded-xl shadow-card-hover hover:bg-brand-700 transition-colors"
           >
-            <Download size={16} /> Export CSV
+            <Download className="w-4 h-4" /> Export CSV
           </button>
         </div>
       </header>
 
-      <div className="glass-panel" style={{ overflow: 'hidden' }}>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Currency</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((tx) => (
-              <tr 
-                key={tx.id} 
-                onClick={() => setSelectedTx(tx)}
-                style={{ cursor: 'pointer', transition: 'background-color 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.02)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
-                <td style={{ fontFamily: 'monospace', color: 'var(--primary-blue)', fontWeight: 500 }}>{tx.id}</td>
-                <td style={{ fontWeight: 500 }}>{tx.type}</td>
-                <td style={{ fontWeight: 600 }}>
-                  {tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </td>
-                <td style={{ color: 'var(--text-muted)' }}>{tx.currency}</td>
-                <td>
-                  <span className={`badge ${tx.status === 'Settled' ? 'badge-green' : tx.status === 'Processing' ? 'badge-yellow' : 'badge-blue'}`}>
-                    {tx.status}
-                  </span>
-                </td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{tx.date}</td>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Transaction ID</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Type</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Amount</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Currency</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Date</th>
               </tr>
-            ))}
-            {transactions.length === 0 && (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>No transactions found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {transactions.map((tx) => (
+                <tr 
+                  key={tx.id} 
+                  onClick={() => setSelectedTx(tx)}
+                  className="hover:bg-slate-50 cursor-pointer transition-colors group"
+                >
+                  <td className="px-6 py-4">
+                    <span className="font-mono font-bold text-brand-600 group-hover:text-brand-700 transition-colors">{tx.id}</span>
+                  </td>
+                  <td className="px-6 py-4 font-medium text-slate-900">{tx.type}</td>
+                  <td className="px-6 py-4 text-right">
+                    <span className={`font-mono font-bold ${tx.amount > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
+                      {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 font-medium text-slate-500">{tx.currency}</td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${
+                      tx.status === 'Settled' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
+                      tx.status === 'Processing' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
+                      'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {tx.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right text-sm text-slate-500 font-medium">
+                    {tx.date}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {transactions.length === 0 && (
+          <div className="p-12 text-center text-slate-500">
+            No transactions found.
+          </div>
+        )}
       </div>
 
-      <Modal isOpen={!!selectedTx} onClose={() => setSelectedTx(null)} title={`Transaction Details`} width="500px">
+      <Modal isOpen={!!selectedTx} onClose={() => setSelectedTx(null)} title="Transaction Details">
         {selectedTx && (
-          <div>
-            <div className="flex justify-between items-start mb-6 pb-6 border-b" style={{ borderBottom: '1px solid var(--border-glass-solid)' }}>
-              <div>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px', fontFamily: 'monospace' }}>{selectedTx.id}</div>
-                <div style={{ fontSize: '28px', fontWeight: 600 }}>
-                  {selectedTx.currency} {selectedTx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          <div className="space-y-6">
+            <div className="bg-slate-50 rounded-xl p-5 flex items-center justify-between border border-slate-200">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm">
+                  {selectedTx.type === 'Import' ? <Globe2 className="w-6 h-6 text-brand-500" /> : <Building2 className="w-6 h-6 text-emerald-500" />}
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-lg">{selectedTx.type} Settlement</h3>
+                  <p className="text-slate-500 font-mono text-sm">{selectedTx.id}</p>
                 </div>
               </div>
-              <span className={`badge ${selectedTx.status === 'Settled' ? 'badge-green' : selectedTx.status === 'Processing' ? 'badge-yellow' : 'badge-blue'}`} style={{ padding: '6px 12px', fontSize: '13px' }}>
-                {selectedTx.status}
-              </span>
+              <div className="text-right">
+                <p className={`text-2xl font-mono font-bold ${selectedTx.amount > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
+                  {selectedTx.amount > 0 ? '+' : ''}{selectedTx.amount.toLocaleString()} {selectedTx.currency}
+                </p>
+                <p className="text-sm font-medium text-slate-500">{selectedTx.date}</p>
+              </div>
             </div>
 
-            <h3 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Globe2 size={16} className="text-muted" /> Audit Trail & Lifecycle
-            </h3>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900 mb-4 px-2">Settlement Timeline</h4>
+              <div className="relative pl-6 space-y-6">
+                <div className="absolute top-2 bottom-2 left-2.5 w-0.5 bg-slate-200"></div>
+                {getTimeline(selectedTx).map((step, idx) => (
+                  <div key={idx} className="relative">
+                    <div className={`absolute -left-6 top-0 w-5 h-5 rounded-full border-2 flex items-center justify-center bg-white
+                      ${step.status === 'done' ? 'border-emerald-500 text-emerald-500' : 
+                        step.status === 'active' ? 'border-brand-500 text-brand-500 shadow-[0_0_0_4px_rgba(14,165,233,0.1)]' : 
+                        step.status === 'error' ? 'border-red-500 text-red-500' :
+                        'border-slate-300 text-slate-300'}`}
+                    >
+                      {step.status === 'done' ? <Check className="w-3 h-3" /> : 
+                       step.status === 'active' ? <Clock className="w-3 h-3 animate-spin-slow" /> : 
+                       <div className="w-1.5 h-1.5 rounded-full bg-current" />}
+                    </div>
+                    <div className="pl-4">
+                      <p className={`text-sm font-bold ${step.status === 'active' ? 'text-brand-700' : 'text-slate-900'}`}>{step.title}</p>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5">{step.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             
-            <div style={{ paddingLeft: '8px' }}>
-              {getTimeline(selectedTx).map((step, idx, arr) => (
-                <div key={idx} style={{ display: 'flex', gap: '16px', marginBottom: idx === arr.length - 1 ? '0' : '20px', position: 'relative' }}>
-                  {/* Timeline Line */}
-                  {idx !== arr.length - 1 && (
-                    <div style={{ position: 'absolute', left: '11px', top: '24px', bottom: '-20px', width: '2px', background: step.status === 'done' ? 'var(--primary-green)' : 'var(--border-glass-solid)', zIndex: 1 }} />
-                  )}
-                  
-                  {/* Timeline Node */}
-                  <div style={{ 
-                    width: '24px', height: '24px', borderRadius: '50%', zIndex: 2,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                    background: step.status === 'done' ? 'var(--primary-green)' : step.status === 'active' ? '#ca8a04' : '#f1f5f9',
-                    color: step.status === 'pending' ? 'var(--text-muted)' : 'white'
-                  }}>
-                    {step.status === 'done' && <Check size={14} />}
-                    {step.status === 'active' && <Clock size={14} />}
-                    {step.status === 'pending' && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--border-focus)' }} />}
-                  </div>
-
-                  {/* Timeline Content */}
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: step.status === 'active' ? 600 : 500, color: step.status === 'pending' ? 'var(--text-muted)' : 'inherit' }}>{step.title}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{step.time}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex justify-end pt-4 border-t border-slate-100">
+              <button onClick={() => setSelectedTx(null)} className="px-6 py-2 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-colors">
+                Close
+              </button>
             </div>
-
-            <div style={{ marginTop: '32px', padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border-glass-solid)', display: 'flex', gap: '12px' }}>
-              <Building2 size={20} className="text-muted" />
-              <div>
-                <div style={{ fontSize: '13px', fontWeight: 500, marginBottom: '2px' }}>Compliance Guarantee</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>This transaction has been screened against OFAC, UN, and localized AML registries. Automated Form 15CA/CB documentation has been filed.</div>
-              </div>
-            </div>
-
-            <button 
-              onClick={() => {
-                addToast('Downloading...', 'Receipt PDF is being generated.', 'info');
-                setTimeout(() => {
-                  const content = `TRANSACTION RECEIPT\n\nID: ${selectedTx.id}\nDate: ${selectedTx.date}\nType: ${selectedTx.type}\nAmount: ${selectedTx.currency} ${selectedTx.amount}\nStatus: ${selectedTx.status}\n\nGenerated by FrontierPay`;
-                  const blob = new Blob([content], { type: 'text/plain' });
-                  const link = document.createElement('a');
-                  link.href = URL.createObjectURL(blob);
-                  link.download = `Receipt_${selectedTx.id}.txt`;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                  addToast('Download Complete', 'Receipt saved.', 'success');
-                }, 1000);
-              }} 
-              className="btn btn-secondary w-full mt-6" style={{ justifyContent: 'center' }}
-            >
-              <Download size={16} /> Download Official Receipt
-            </button>
           </div>
         )}
       </Modal>
-
     </div>
   );
 }
