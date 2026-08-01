@@ -38,6 +38,7 @@ export default function ImportPaymentsPage() {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
   const [invoiceRef, setInvoiceRef] = useState('');
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   
   // Compliance State
   const [hasTRC, setHasTRC] = useState(true);
@@ -75,6 +76,7 @@ export default function ImportPaymentsPage() {
     setActiveModal(null);
     setAmount('');
     setInvoiceRef('');
+    setAttachedFile(null);
   };
 
   return (
@@ -189,9 +191,28 @@ export default function ImportPaymentsPage() {
 
           <div className="form-group">
             <label className="form-label">Attach Documents (Invoice, Waybill)</label>
-            <div style={{ border: '1px dashed var(--border-glass-solid)', borderRadius: '8px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.01)', cursor: 'pointer' }}>
-              <Upload size={16} className="text-muted" />
-              <span className="text-muted" style={{ fontSize: '13px' }}>Click to upload files or drag and drop</span>
+            <div style={{ position: 'relative', border: '1px dashed var(--border-glass-solid)', borderRadius: '8px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.01)', cursor: 'pointer' }}>
+              <input 
+                type="file" 
+                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} 
+                onChange={(e) => setAttachedFile(e.target.files?.[0] || null)} 
+              />
+              {attachedFile ? (
+                <>
+                  <div style={{ width: '36px', height: '36px', background: '#dcfce7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckCircle2 size={18} className="text-green-600" />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>{attachedFile.name}</p>
+                    <p style={{ fontSize: '12px', color: '#16a34a', fontWeight: 500 }}>Ready for compliance scan</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Upload size={16} className="text-muted" />
+                  <span className="text-muted" style={{ fontSize: '13px' }}>Click to upload files or drag and drop</span>
+                </>
+              )}
             </div>
           </div>
           
