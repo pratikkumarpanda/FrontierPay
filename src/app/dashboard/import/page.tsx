@@ -73,7 +73,7 @@ export default function ImportPaymentWizard() {
     addTransaction({
       id: `TX-${Math.floor(Math.random() * 10000)}`,
       date: new Date().toISOString().split('T')[0],
-      description: `Import Payment to ${selectedBene.name}`,
+      counterparty: selectedBene.name,
       amount: -invoiceVal,
       currency: 'USD',
       status: 'Processing',
