@@ -20,33 +20,33 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-      {/* Background Orbs */}
-      <div style={{ position: 'absolute', top: '10%', left: '10%', width: '400px', height: '400px', background: 'var(--primary-blue)', filter: 'blur(120px)', opacity: 0.15, borderRadius: '50%' }}></div>
-      <div style={{ position: 'absolute', bottom: '10%', right: '10%', width: '400px', height: '400px', background: 'var(--primary-green)', filter: 'blur(120px)', opacity: 0.15, borderRadius: '50%' }}></div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-50 selection:bg-brand-500/30">
+      {/* Background Animated Blobs */}
+      <div className="absolute top-10 left-10 w-[500px] h-[500px] rounded-full bg-brand-100/60 blur-3xl opacity-50 pointer-events-none"></div>
+      <div className="absolute bottom-10 right-10 w-[500px] h-[500px] rounded-full bg-indigo-100/60 blur-3xl opacity-50 pointer-events-none"></div>
 
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '440px', padding: '48px', zIndex: 10, background: 'rgba(255,255,255,0.85)' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
+      <div className="w-full max-w-md p-10 z-10 bg-white/60 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] relative">
+        <div className="flex justify-center mb-8">
           <Link href="/" className="flex items-center gap-3">
-            <div style={{ position: 'relative', width: '32px', height: '32px' }}>
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
-                <path d="M 20 50 Q 30 20 60 20 L 80 20 Q 50 30 50 50 Z" fill="var(--primary-blue)" />
-                <path d="M 15 75 Q 25 55 50 55 L 70 55 Q 40 65 40 85 Z" fill="var(--primary-green)" />
+            <div className="relative w-10 h-10">
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                <path d="M 20 50 Q 30 20 60 20 L 80 20 Q 50 30 50 50 Z" className="fill-brand-600" />
+                <path d="M 15 75 Q 25 55 50 55 L 70 55 Q 40 65 40 85 Z" className="fill-emerald-500" />
               </svg>
             </div>
-            <span className="brand-font font-semibold" style={{ fontSize: '24px' }}>FrontierPay</span>
+            <span className="font-bold text-slate-900 text-2xl tracking-tight">Frontier<span className="text-brand-600">Pay</span></span>
           </Link>
         </div>
 
-        <h1 style={{ fontSize: '24px', fontWeight: 600, textAlign: 'center', marginBottom: '8px' }}>Welcome back</h1>
-        <p className="text-muted" style={{ textAlign: 'center', fontSize: '14px', marginBottom: '32px' }}>Enter your corporate credentials to access the treasury.</p>
+        <h1 className="text-2xl font-bold text-slate-900 text-center tracking-tight mb-2">Welcome back</h1>
+        <p className="text-slate-500 text-center text-sm mb-8">Enter your corporate credentials to access the treasury.</p>
 
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label className="form-label">Corporate Email</label>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Corporate Email</label>
             <input 
               type="email" 
-              className="form-input" 
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 placeholder:text-slate-400 font-medium" 
               placeholder="founder@company.com" 
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -54,14 +54,14 @@ export default function LoginPage() {
             />
           </div>
           
-          <div className="form-group" style={{ marginBottom: '24px' }}>
-            <div className="flex justify-between">
-              <label className="form-label">Password</label>
-              <Link href="#" className="text-blue" style={{ fontSize: '13px', fontWeight: 500 }}>Forgot password?</Link>
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-bold text-slate-900">Password</label>
+              <Link href="#" className="text-brand-600 text-sm font-bold hover:text-brand-700 transition-colors">Forgot password?</Link>
             </div>
             <input 
               type="password" 
-              className="form-input" 
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 placeholder:text-slate-400 font-medium font-mono tracking-widest" 
               placeholder="••••••••" 
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -71,17 +71,16 @@ export default function LoginPage() {
 
           <button 
             type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%', padding: '14px', fontSize: '15px' }}
+            className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5"
             disabled={isLoading}
           >
-            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <>Sign In securely <ArrowRight size={18} /></>}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Sign In securely <ArrowRight className="w-5 h-5" /></>}
           </button>
         </form>
 
-        <div style={{ marginTop: '32px', textAlign: 'center', borderTop: '1px solid var(--border-glass-solid)', paddingTop: '24px' }}>
-          <p className="text-muted" style={{ fontSize: '13px' }}>
-            Protected by bank-grade encryption <Key size={12} style={{ display: 'inline', marginLeft: '4px' }} />
+        <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5">
+            Protected by bank-grade encryption <Key className="w-3.5 h-3.5" />
           </p>
         </div>
       </div>

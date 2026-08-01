@@ -20,7 +20,7 @@ export default function WalletsPage() {
     if (!val || val <= 0) return;
     addBalance('INR', val);
     addTransaction({ id: `TRX-${Math.floor(Math.random()*10000)}`, type: 'Internal', amount: val, currency: 'INR', status: 'Settled', date: 'Just now' });
-    addToast('Wallet Funded', `Successfully pulled ₹${val.toLocaleString()} from HDFC Bank.`, 'success');
+    addToast('Wallet Funded', `Successfully pulled ₹${val.toLocaleString('en-IN')} from HDFC Bank.`, 'success');
     setActiveModal(null);
     setAmount('');
   };
@@ -31,7 +31,7 @@ export default function WalletsPage() {
     if (!val || val <= 0 || val > balances.INR) return addToast('Error', 'Insufficient balance', 'error');
     deductBalance('INR', val);
     addTransaction({ id: `TRX-${Math.floor(Math.random()*10000)}`, type: 'Internal', amount: val, currency: 'INR', status: 'Processing', date: 'Just now' });
-    addToast('Withdrawal Initiated', `₹${val.toLocaleString()} is being sent to your HDFC Bank account.`, 'info');
+    addToast('Withdrawal Initiated', `₹${val.toLocaleString('en-IN')} is being sent to your HDFC Bank account.`, 'info');
     setActiveModal(null);
     setAmount('');
   };
@@ -49,13 +49,14 @@ export default function WalletsPage() {
     deductBalance(fromCurrency, val);
     addBalance('INR', convertedINR);
     addTransaction({ id: `TRX-${Math.floor(Math.random()*10000)}`, type: 'Conversion', amount: val, currency: fromCurrency, status: 'Settled', date: 'Just now' });
-    addToast('Conversion Successful', `Converted ${fromCurrency} ${val.toLocaleString()} to ₹${convertedINR.toLocaleString(undefined, {maximumFractionDigits: 2})}`, 'success');
+    addToast('Conversion Successful', `Converted ${fromCurrency} ${val.toLocaleString('en-US')} to ₹${convertedINR.toLocaleString('en-IN', {maximumFractionDigits: 2})}`, 'success');
     setActiveModal(null);
     setAmount('');
   };
 
   const formatCurrency = (val: number, curr: string) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: curr }).format(val);
+    const locale = curr === 'INR' ? 'en-IN' : 'en-US';
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: curr }).format(val);
   };
 
   return (

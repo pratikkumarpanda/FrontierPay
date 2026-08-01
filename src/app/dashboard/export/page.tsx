@@ -75,7 +75,7 @@ export default function ExportReceiptsDecision() {
              </div>
              
              <div className="mb-8 relative z-10">
-                <h2 className="text-5xl font-mono font-bold text-slate-900 tracking-tighter">${incomingAmount.toLocaleString()} <span className="text-2xl text-slate-400 font-sans">USD</span></h2>
+                <h2 className="text-5xl font-mono font-bold text-slate-900 tracking-tighter">${incomingAmount.toLocaleString('en-US')} <span className="text-2xl text-slate-400 font-sans">USD</span></h2>
                 <div className="mt-4 flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm font-bold text-sm">
                   <CheckCircle2 className="w-4 h-4" /> Cleared AML & Sanctions
                 </div>
@@ -142,14 +142,14 @@ export default function ExportReceiptsDecision() {
                 {conversionSplit > 0 && <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all"></div>}
                 <div className="text-xs font-bold uppercase tracking-widest mb-4 transition-colors ${conversionSplit > 0 ? 'text-emerald-700' : 'text-slate-400'}">Convert to INR ({conversionSplit}%)</div>
                 <div className={`text-4xl font-mono font-bold tracking-tight transition-colors ${conversionSplit > 0 ? 'text-emerald-700' : 'text-slate-300'}`}>
-                  ₹ {inrYield.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  ₹ {inrYield.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </div>
               </div>
               <div className={`p-8 rounded-[1.5rem] border-2 transition-all duration-500 relative overflow-hidden group ${conversionSplit < 100 ? 'bg-gradient-to-br from-brand-500/10 to-brand-500/5 border-brand-400 shadow-[0_8px_30px_rgba(14,165,233,0.15)] scale-[1.02]' : 'bg-slate-50 border-slate-200'}`}>
                 {conversionSplit < 100 && <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all"></div>}
                 <div className="text-xs font-bold uppercase tracking-widest mb-4 transition-colors ${conversionSplit < 100 ? 'text-brand-700' : 'text-slate-400'}">Park in EEFC ({100 - conversionSplit}%)</div>
                 <div className={`text-4xl font-mono font-bold tracking-tight transition-colors ${conversionSplit < 100 ? 'text-brand-700' : 'text-slate-300'}`}>
-                  ${usdYield.toLocaleString()}
+                  ${usdYield.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                 </div>
               </div>
             </div>

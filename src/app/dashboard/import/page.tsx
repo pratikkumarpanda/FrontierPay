@@ -122,10 +122,10 @@ export default function ImportPaymentWizard() {
             New Outflow Transfer
           </h1>
         </div>
-        <div className="text-right glass-panel px-6 py-3 rounded-2xl bg-white/60">
+        <div className="text-right bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/40 shadow-sm">
           <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Available INR Balance</p>
           <p className="text-2xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700">
-            ₹ {(balances['INR'] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            ₹ {(balances['INR'] || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
           </p>
         </div>
       </header>
@@ -155,7 +155,7 @@ export default function ImportPaymentWizard() {
         
         {/* STEP 1: BENEFICIARY */}
         {currentStep === 1 && (
-          <div className="glass-panel p-10 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
+          <div className="p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 animate-slide-in">
             <div className="flex justify-between items-center mb-10">
               <div>
                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">Who are you paying?</h3>
@@ -229,7 +229,7 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 2: PAYMENT DETAILS */}
         {currentStep === 2 && (
-          <div className="glass-panel p-10 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
+          <div className="p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 animate-slide-in">
              <div className="flex justify-between items-start mb-10">
               <div>
                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">How much to send?</h3>
@@ -271,17 +271,17 @@ export default function ImportPaymentWizard() {
                   </div>
                   <div className="flex justify-between text-base mb-4">
                     <span className="text-slate-500 font-medium">Platform Fee <span className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-1">0.20%</span></span>
-                    <span className="font-mono font-bold text-slate-900">₹ {((inrBaseCost * 0.002)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    <span className="font-mono font-bold text-slate-900">₹ {((inrBaseCost * 0.002)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
                   </div>
                   <div className="flex justify-between text-base mb-6">
                     <span className="text-slate-500 font-medium">Network Wire Fee</span>
-                    <span className="font-mono font-bold text-slate-900">${NETWORK_FEE_USD.toFixed(2)} <span className="text-slate-400 text-sm ml-1 font-medium">(₹ {networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span></span>
+                    <span className="font-mono font-bold text-slate-900">${NETWORK_FEE_USD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-slate-400 text-sm ml-1 font-medium">(₹ {networkFeeInr.toLocaleString('en-IN', { maximumFractionDigits: 0 })})</span></span>
                   </div>
                   <div className="h-px bg-slate-200/80 my-6"></div>
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-slate-900 text-lg">Total INR to Debit</span>
                     <span className="font-mono font-bold text-2xl text-brand-600">
-                      ₹ {invoiceVal ? totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
+                      ₹ {invoiceVal ? totalInrToDebit.toLocaleString('en-IN', { maximumFractionDigits: 0 }) : '0'}
                     </span>
                   </div>
                 </div>
@@ -321,7 +321,7 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 3: COMPLIANCE SHIELD */}
         {currentStep === 3 && (
-          <div className="glass-panel p-10 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
+          <div className="p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 animate-slide-in">
              <div className="mb-10">
                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-1 flex items-center gap-3">
                   <ShieldCheck className="w-8 h-8 text-brand-600" />
@@ -435,20 +435,17 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 4: REVIEW */}
         {currentStep === 4 && (
-          <div className="glass-panel p-12 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
-             <div className="text-center mb-12">
-               <div className="w-20 h-20 bg-brand-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border-2 border-brand-100 shadow-lg shadow-brand-500/10 rotate-3">
-                  <Building2 className="w-10 h-10 text-brand-600 -rotate-3" />
-               </div>
-               <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Confirm Transfer</h3>
-               <p className="text-slate-500 text-base mt-3 font-medium max-w-sm mx-auto">Please review the final settlement details carefully before authorizing.</p>
+          <div className="p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 animate-slide-in">
+             <div className="mb-10 text-center">
+                <h3 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Review & Confirm</h3>
+                <p className="text-slate-500 font-medium">Please verify all details before executing this payment.</p>
              </div>
 
              <div className="bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden mb-12 max-w-2xl mx-auto shadow-lg shadow-slate-200/50 relative">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-brand-400 to-brand-600"></div>
                 <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center pl-10">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Amount to Debit</span>
-                  <span className="text-3xl font-mono font-bold text-slate-900">₹ {totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Transfer Amount</span>
+                  <span className="text-4xl font-mono font-bold text-slate-900 tracking-tighter">${invoiceVal.toLocaleString('en-US')}</span>
                 </div>
                 <div className="p-10 flex flex-col gap-6 pl-12">
                   <div className="flex justify-between text-base">
