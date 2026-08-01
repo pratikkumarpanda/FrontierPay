@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   ...(isProd && {
     output: "export",
     basePath: "/FrontierPay",
+    trailingSlash: true,
   }),
   images: {
     unoptimized: true,

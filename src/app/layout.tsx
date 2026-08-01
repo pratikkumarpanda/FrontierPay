@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,9 +13,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        {children}
-      </body>
+      <head>
+        {/* GitHub Pages deep-link restore: reads path saved by 404.html and
+            applies it via history.replaceState before React hydrates */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var redirect = sessionStorage.getItem('ghpages_redirect');
+                if (redirect) {
+                  sessionStorage.removeItem('ghpages_redirect');
+                  if (redirect !== location.pathname + location.search + location.hash) {
+                    history.replaceState(null, null, redirect);
+                  }
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }
