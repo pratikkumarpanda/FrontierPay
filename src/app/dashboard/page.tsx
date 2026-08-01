@@ -38,7 +38,7 @@ export default function DashboardHome() {
             </div>
           </div>
           <h2 className="text-3xl font-mono font-bold text-slate-900 mb-4 relative z-10">
-            ₹{balances.INR.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            ₹{balances.INR.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
           </h2>
           <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 relative z-10">
             <ArrowUpRight size={14} /> <span>+4.2%</span> <span className="text-slate-400 font-medium ml-1">from last month</span>
@@ -56,10 +56,10 @@ export default function DashboardHome() {
             </div>
           </div>
           <h2 className="text-3xl font-mono font-bold text-slate-900 mb-4 relative z-10">
-            ${balances.USD.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            ${balances.USD.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </h2>
           <div className="text-xs font-medium text-slate-500 relative z-10">
-            Unconverted (~₹{(balances.USD * (fxRates.INR || 83)).toLocaleString(undefined, {maximumFractionDigits: 0})})
+            Unconverted (~₹{(balances.USD * (fxRates.INR || 83)).toLocaleString('en-IN', {maximumFractionDigits: 0})})
           </div>
         </div>
 

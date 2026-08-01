@@ -99,7 +99,7 @@ export default function TransactionsPage() {
                   <td className="px-6 py-4 font-medium text-slate-900">{tx.type}</td>
                   <td className="px-6 py-4 text-right">
                     <span className={`font-mono font-bold ${tx.amount > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
-                      {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString(tx.currency === 'INR' ? 'en-IN' : 'en-US', { minimumFractionDigits: 2 })}
                     </span>
                   </td>
                   <td className="px-6 py-4 font-medium text-slate-500">{tx.currency}</td>

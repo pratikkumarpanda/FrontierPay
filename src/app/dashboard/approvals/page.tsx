@@ -81,7 +81,7 @@ export default function ApprovalsPage() {
                     <td className="px-8 py-6 text-right">
                       <span className="font-mono font-bold text-slate-900 text-lg">
                         {tx.currency === 'USD' ? '$' : tx.currency === 'INR' ? '₹' : ''}
-                        {tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} {tx.currency}
+                        {tx.amount.toLocaleString(tx.currency === 'INR' ? 'en-IN' : 'en-US', { minimumFractionDigits: 2 })} {tx.currency}
                       </span>
                     </td>
                     <td className="px-8 py-6">

@@ -67,7 +67,7 @@ export default function FXCalculatorPage() {
                 <input 
                   type="text" 
                   className="form-input" 
-                  value={convertedAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} 
+                  value={convertedAmount.toLocaleString('en-US', { maximumFractionDigits: 2 })} 
                   disabled
                   style={{ flex: 1, background: 'rgba(0,0,0,0.02)' }}
                 />

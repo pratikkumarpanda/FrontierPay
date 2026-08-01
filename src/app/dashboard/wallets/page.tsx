@@ -124,7 +124,7 @@ export default function WalletsPage() {
           <div className="relative z-10 mb-10">
             <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">{formatCurrency(balances.USD, 'USD')}</h2>
             <p className="text-sm font-medium text-slate-500 bg-slate-50 inline-block px-4 py-2 rounded-lg border border-slate-200">
-               ~₹{(balances.USD * (fxRates['INR'] || 83.5)).toLocaleString(undefined, {maximumFractionDigits: 2})} at current rate
+               ~₹{(balances.USD * (fxRates['INR'] || 83.5)).toLocaleString('en-IN', {maximumFractionDigits: 2})} at current rate
             </p>
           </div>
           
@@ -153,9 +153,9 @@ export default function WalletsPage() {
           </div>
           
           <div className="relative z-10 mb-10">
-            <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">SGD {balances.SGD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h2>
+            <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">SGD {balances.SGD.toLocaleString('en-SG', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h2>
             <p className="text-sm font-medium text-slate-500 bg-slate-50 inline-block px-4 py-2 rounded-lg border border-slate-200">
-               ~₹{(balances.SGD * ((fxRates['INR'] || 83.5) / (fxRates['SGD'] || 1.35))).toLocaleString(undefined, {maximumFractionDigits: 2})} at current rate
+               ~₹{(balances.SGD * ((fxRates['INR'] || 83.5) / (fxRates['SGD'] || 1.35))).toLocaleString('en-IN', {maximumFractionDigits: 2})} at current rate
             </p>
           </div>
           
