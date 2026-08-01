@@ -59,7 +59,7 @@ export default function ImportPaymentWizard() {
   };
 
   const handleConfirmPay = () => {
-    const inrBalance = balances.find(b => b.currency === 'INR')?.amount || 0;
+    const inrBalance = balances['INR'] || 0;
     
     if (inrBalance < totalInrToDebit) {
       addToast('Insufficient INR Balance', `You need ₹${totalInrToDebit.toLocaleString()} to settle this transaction.`, 'error');
@@ -122,7 +122,7 @@ export default function ImportPaymentWizard() {
         <div style={{ textAlign: 'right' }}>
           <p style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Available INR Balance</p>
           <p style={{ fontSize: '18px', fontWeight: 700, fontFamily: 'monospace' }}>
-            ₹ {(balances.find(b => b.currency === 'INR')?.amount || 0).toLocaleString()}
+            ₹ {(balances['INR'] || 0).toLocaleString()}
           </p>
         </div>
       </header>
