@@ -62,7 +62,7 @@ export type ToastMessage = {
 };
 
 export type PricingTier = 'Starter' | 'Growth' | 'Enterprise';
-export const SWIFT_FEE_USD = 15;
+export const NETWORK_FEE_USD = 15;
 export const MARKUP_MAP: Record<PricingTier, number> = {
   Starter: 0.0058, // 0.58%
   Growth: 0.0038,  // 0.38%

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { useMock, SWIFT_FEE_USD } from '@/lib/MockContext';
+import { useMock, NETWORK_FEE_USD } from '@/lib/MockContext';
 import { FileText, ArrowRight, CheckCircle2, AlertTriangle, Upload, UserPlus } from 'lucide-react';
 import Modal from '@/components/Modal';
 
@@ -52,8 +52,8 @@ export default function ImportPaymentsPage() {
   const currencyRateToUSD = fxRates[currency] || 1; 
   const usdEquivalent = invoiceVal / currencyRateToUSD;
   const inrBaseCost = usdEquivalent * (fxRates['INR'] || 83.5);
-  const swiftFeeInr = SWIFT_FEE_USD * (fxRates['INR'] || 83.5);
-  const totalInrToDebit = (inrBaseCost + swiftFeeInr) * markupMultiplier;
+  const networkFeeInr = NETWORK_FEE_USD * (fxRates['INR'] || 83.5);
+  const totalInrToDebit = (inrBaseCost + networkFeeInr) * markupMultiplier;
 
   const [isScanning, setIsScanning] = useState(false);
   const [scanStep, setScanStep] = useState(0);
@@ -275,8 +275,8 @@ export default function ImportPaymentsPage() {
               <span style={{ fontSize: '14px', fontWeight: 500 }}>{((markupMultiplier - 1) * 100).toFixed(2)}%</span>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>SWIFT Wire Fee</span>
-              <span style={{ fontSize: '14px', fontWeight: 500 }}>${SWIFT_FEE_USD.toFixed(2)} (₹{swiftFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Network Wire Fee</span>
+              <span style={{ fontSize: '14px', fontWeight: 500 }}>${NETWORK_FEE_USD.toFixed(2)} (₹{networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
             </div>
             <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--border-glass-solid)' }}>
               <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Total Cost to debit</span>

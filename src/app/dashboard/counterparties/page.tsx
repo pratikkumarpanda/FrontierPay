@@ -18,7 +18,7 @@ export default function CounterpartiesPage() {
     if (!name || !country || !account) return;
     
     setIsVerifying(true);
-    addToast('Verifying SWIFT BIC...', 'Connecting to SWIFT network directory...', 'info');
+    addToast('Verifying Bank BIC...', 'Connecting to global bank network directory...', 'info');
     
     setTimeout(() => {
       addCounterparty({ name, country, account });

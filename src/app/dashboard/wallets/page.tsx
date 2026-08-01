@@ -214,7 +214,7 @@ export default function WalletsPage() {
             <div style={{ fontWeight: 600, fontSize: '15px', fontFamily: 'monospace' }}>8371920045</div>
           </div>
           <div>
-            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>SWIFT BIC</label>
+            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>Bank BIC</label>
             <div style={{ fontWeight: 600, fontSize: '15px', fontFamily: 'monospace' }}>DBSSGSG</div>
           </div>
         </div>

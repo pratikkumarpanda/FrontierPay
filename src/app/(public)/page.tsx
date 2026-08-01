@@ -121,7 +121,7 @@ export default function Home() {
                     <div className="flex items-center gap-3">
                       <div style={{ background: '#ecfdf5', color: 'var(--primary-green)', padding: '6px', borderRadius: '50%' }}><ArrowRight size={14} /></div>
                       <div>
-                        <div style={{ fontSize: '13px', fontWeight: 500 }}>Inbound SWIFT (Acme Corp)</div>
+                        <div style={{ fontSize: '13px', fontWeight: 500 }}>Inbound Wire (Acme Corp)</div>
                         <div className="text-muted" style={{ fontSize: '11px' }}>Processed today at 10:45 AM</div>
                       </div>
                     </div>

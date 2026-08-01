@@ -7,7 +7,7 @@ export default function PricingPage() {
         <div style={{ textAlign: 'center', marginBottom: '64px' }}>
           <h1 style={{ fontSize: '48px', marginBottom: '16px', letterSpacing: '-0.02em' }}>Transparent Pricing</h1>
           <p className="text-muted" style={{ fontSize: '18px', maxWidth: '600px', margin: '0 auto' }}>
-            No hidden SWIFT fees, no spread markups. Just a single transparent fee based on your volume.
+            No hidden wire fees, no spread markups. Just a single transparent fee based on your volume.
           </p>
         </div>
 

@@ -10,7 +10,7 @@ export default function AboutPage() {
         <div className="glass-panel" style={{ padding: '40px', marginBottom: '40px' }}>
           <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>The Problem</h2>
           <p className="text-muted" style={{ fontSize: '16px', lineHeight: 1.6, marginBottom: '24px' }}>
-            For decades, traditional banks have charged opaque markups (up to 3%) on foreign exchange, coupled with high SWIFT fees and slow settlement times. For a growing Indian exporter or importer, these hidden costs eat directly into profit margins.
+            For decades, traditional banks have charged opaque markups (up to 3%) on foreign exchange, coupled with high transfer fees and slow settlement times. For a growing Indian exporter or importer, these hidden costs eat directly into profit margins.
           </p>
           <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>Our Solution</h2>
           <p className="text-muted" style={{ fontSize: '16px', lineHeight: 1.6 }}>

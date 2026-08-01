@@ -33,7 +33,7 @@ export default function TopBar() {
   ).slice(0, 5);
 
   const notifications = [
-    { id: 1, title: 'SWIFT Payment Settled', message: 'Inbound transfer of $12,000 has cleared.', time: '10m ago', type: 'success' },
+    { id: 1, title: 'Wire Payment Settled', message: 'Inbound transfer of $12,000 has cleared.', time: '10m ago', type: 'success' },
     { id: 2, title: 'Action Required', message: 'Please upload Form 15CA for TRX-7341.', time: '1h ago', type: 'warning' },
     { id: 3, title: 'New Device Login', message: 'Login detected from Mumbai, IN.', time: '2h ago', type: 'info' }
   ];

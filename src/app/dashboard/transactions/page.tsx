@@ -14,7 +14,7 @@ export default function TransactionsPage() {
         { title: 'Payment Initiated', time: 'T-0 09:00 AM', status: 'done' },
         { title: 'AML & Sanctions Cleared', time: 'T-0 09:05 AM', status: 'done' },
         { title: 'FX Conversion Executed', time: 'T-0 09:12 AM', status: 'done' },
-        { title: 'Sent to SWIFT Network', time: 'T-0 09:30 AM', status: 'done' },
+        { title: 'Sent to Banking Network', time: 'T-0 09:30 AM', status: 'done' },
         { title: 'Settled to Beneficiary', time: tx.date, status: 'done' }
       ];
     } else if (tx.status === 'Processing') {
@@ -22,7 +22,7 @@ export default function TransactionsPage() {
         { title: 'Payment Initiated', time: tx.date, status: 'done' },
         { title: 'AML & Sanctions Cleared', time: 'Just now', status: 'done' },
         { title: 'Executing FX Conversion', time: 'In Progress', status: 'active' },
-        { title: 'Awaiting SWIFT Dispatch', time: 'Pending', status: 'pending' },
+        { title: 'Awaiting Dispatch', time: 'Pending', status: 'pending' },
         { title: 'Settled to Beneficiary', time: 'Pending', status: 'pending' }
       ];
     } else {
