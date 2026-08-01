@@ -1,15 +1,14 @@
 "use client";
 import React, { useState } from 'react';
 import { useMock } from '@/lib/MockContext';
-import { ArrowDownLeft, ArrowUpRight, RefreshCw, Plus, Building2, CreditCard } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, RefreshCcw, Plus, WalletCards } from 'lucide-react';
 import Modal from '@/components/Modal';
 
 export default function WalletsPage() {
-  const { balances, addBalance, deductBalance, fxRates, addToast, addTransaction, tier, markupMultiplier } = useMock();
-  const markupPercent = ((markupMultiplier - 1) * 100).toFixed(2);
+  const { balances, addBalance, deductBalance, fxRates, addToast, addTransaction, markupMultiplier } = useMock();
   
   // Modal States
-  const [activeModal, setActiveModal] = useState<'fund' | 'withdraw' | 'convert' | 'send' | 'receive' | 'add' | null>(null);
+  const [activeModal, setActiveModal] = useState<'fund' | 'withdraw' | 'convert' | null>(null);
   
   // Form States
   const [amount, setAmount] = useState('');
@@ -42,13 +41,8 @@ export default function WalletsPage() {
     const val = parseFloat(amount);
     if (!val || val <= 0 || val > balances[fromCurrency]) return addToast('Error', 'Insufficient balance', 'error');
     
-    // Convert logic (USD to INR as example, using fxRates)
-    // The fxRates API we use is base USD. So fxRates.INR is the rate for 1 USD to INR.
-    // If fromCurrency is not USD, we need to convert it to USD first, then to INR.
-    // USD -> INR = val * fxRates.INR
-    // SGD -> INR = (val / fxRates.SGD) * fxRates.INR
-    const toUSD = fromCurrency === 'USD' ? val : val / fxRates[fromCurrency];
-    const interbankINR = toUSD * fxRates['INR'];
+    const toUSD = fromCurrency === 'USD' ? val : val / (fxRates[fromCurrency] || 1);
+    const interbankINR = toUSD * (fxRates['INR'] || 83.5);
     const spreadMultiplier = 1 - (markupMultiplier - 1);
     const convertedINR = interbankINR * spreadMultiplier;
     
@@ -65,159 +59,172 @@ export default function WalletsPage() {
   };
 
   return (
-    <div className="animate-fade-in">
-      <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className="animate-fade-in max-w-7xl mx-auto">
+      <header className="mb-12 flex justify-between items-start">
         <div>
-          <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Multi-Currency Wallets</h1>
-          <p className="text-muted">Manage your treasury balances and fund ledgers.</p>
+           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-4 tracking-tight mb-2">
+            <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+              <WalletCards className="w-6 h-6 fill-current" />
+            </div>
+            Multi-Currency Wallets
+          </h1>
+          <p className="text-slate-500 text-lg">Manage your treasury balances and fund ledgers.</p>
         </div>
-        <button onClick={() => setActiveModal('add')} className="btn btn-primary">
-          <Plus size={16} /> Add Currency
+        <button onClick={() => addToast('Coming Soon', 'Additional currencies will be supported soon.', 'info')} className="px-6 py-3 bg-white text-brand-600 font-bold rounded-xl border-2 border-slate-200 shadow-sm hover:border-brand-300 hover:bg-brand-50 transition-colors flex items-center gap-2">
+          <Plus className="w-4 h-4" /> Add Currency
         </button>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
         
         {/* INR WALLET */}
-        <div className="glass-panel" style={{ padding: '32px' }}>
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-3">
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#eff6ff', color: 'var(--primary-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>₹</div>
+        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-brand-500/20"></div>
+          
+          <div className="flex justify-between items-start mb-10 relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl font-bold border border-brand-100 shadow-inner">₹</div>
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Indian Rupee</h3>
-                <span className="badge badge-blue" style={{ marginTop: '4px', fontSize: '10px' }}>Primary Settlement</span>
+                <h3 className="text-xl font-bold text-slate-900">Indian Rupee</h3>
+                <span className="inline-block mt-1 bg-brand-100 text-brand-700 border border-brand-200 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">Primary Settlement</span>
               </div>
             </div>
           </div>
           
-          <div style={{ fontSize: '36px', fontWeight: 500, marginBottom: '8px' }}>{formatCurrency(balances.INR, 'INR')}</div>
-          <p className="text-muted" style={{ fontSize: '13px', marginBottom: '32px' }}>Account ending in 4921 • HDFC Bank</p>
+          <div className="relative z-10 mb-10">
+            <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">{formatCurrency(balances.INR, 'INR')}</h2>
+            <p className="text-sm font-medium text-slate-500 bg-slate-50 inline-block px-4 py-2 rounded-lg border border-slate-200">Account ending in 4921 • HDFC Bank</p>
+          </div>
           
-          <div className="flex gap-4">
-            <button onClick={() => setActiveModal('fund')} className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}><ArrowDownLeft size={16} /> Fund Wallet</button>
-            <button onClick={() => setActiveModal('withdraw')} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}><ArrowUpRight size={16} /> Withdraw</button>
+          <div className="flex gap-4 relative z-10">
+            <button onClick={() => setActiveModal('fund')} className="flex-1 py-4 bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 hover:shadow-brand-500/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <ArrowDownLeft className="w-5 h-5" /> Fund Wallet
+            </button>
+            <button onClick={() => setActiveModal('withdraw')} className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <ArrowUpRight className="w-5 h-5" /> Withdraw
+            </button>
           </div>
         </div>
 
         {/* USD WALLET */}
-        <div className="glass-panel" style={{ padding: '32px' }}>
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-3">
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ecfdf5', color: 'var(--primary-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>$</div>
+        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-emerald-500/20"></div>
+          
+          <div className="flex justify-between items-start mb-10 relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold border border-emerald-100 shadow-inner">$</div>
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 600 }}>US Dollar (EEFC)</h3>
-                <span className="badge badge-green" style={{ marginTop: '4px', fontSize: '10px' }}>GIFT City Hub</span>
+                <h3 className="text-xl font-bold text-slate-900">US Dollar (EEFC)</h3>
+                <span className="inline-block mt-1 bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">GIFT City Hub</span>
               </div>
             </div>
           </div>
           
-          <div style={{ fontSize: '36px', fontWeight: 500, marginBottom: '8px' }}>{formatCurrency(balances.USD, 'USD')}</div>
-          <p className="text-muted" style={{ fontSize: '13px', marginBottom: '32px' }}>~ {formatCurrency(balances.USD * (fxRates.INR || 83), 'INR')} at current rate</p>
+          <div className="relative z-10 mb-10">
+            <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">{formatCurrency(balances.USD, 'USD')}</h2>
+            <p className="text-sm font-medium text-slate-500 bg-slate-50 inline-block px-4 py-2 rounded-lg border border-slate-200">
+               ~₹{(balances.USD * (fxRates['INR'] || 83.5)).toLocaleString(undefined, {maximumFractionDigits: 2})} at current rate
+            </p>
+          </div>
           
-          <div className="flex gap-4">
-            <button onClick={() => {setFromCurrency('USD'); setActiveModal('convert');}} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}><RefreshCw size={16} /> Convert to INR</button>
-            <button onClick={() => addToast('Not Implemented', 'Send USD flow is in the Import Payments section.', 'info')} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}><ArrowUpRight size={16} /> Send USD</button>
+          <div className="flex gap-4 relative z-10">
+            <button onClick={() => { setFromCurrency('USD'); setActiveModal('convert'); }} className="flex-1 py-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <RefreshCcw className="w-5 h-5" /> Convert to INR
+            </button>
+            <button onClick={() => addToast('Wire Initiated', 'Transfer flow would open here.', 'info')} className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <ArrowUpRight className="w-5 h-5" /> Send USD
+            </button>
           </div>
         </div>
 
         {/* SGD WALLET */}
-        <div className="glass-panel" style={{ padding: '32px' }}>
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-center gap-3">
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#fefce8', color: '#ca8a04', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>S$</div>
+        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-amber-500/20"></div>
+          
+          <div className="flex justify-between items-start mb-10 relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold border border-amber-100 shadow-inner">S$</div>
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Singapore Dollar</h3>
-                <span className="badge badge-yellow" style={{ marginTop: '4px', fontSize: '10px', color: '#ca8a04', backgroundColor: 'rgba(234, 179, 8, 0.1)' }}>Standard Wallet</span>
+                <h3 className="text-xl font-bold text-slate-900">Singapore Dollar</h3>
+                <span className="inline-block mt-1 bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">Standard Wallet</span>
               </div>
             </div>
           </div>
           
-          <div style={{ fontSize: '36px', fontWeight: 500, marginBottom: '8px' }}>{formatCurrency(balances.SGD, 'SGD')}</div>
-          <p className="text-muted" style={{ fontSize: '13px', marginBottom: '32px' }}>~ {formatCurrency((balances.SGD / (fxRates.SGD || 1.34)) * (fxRates.INR || 83), 'INR')} at current rate</p>
+          <div className="relative z-10 mb-10">
+            <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">SGD {balances.SGD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h2>
+            <p className="text-sm font-medium text-slate-500 bg-slate-50 inline-block px-4 py-2 rounded-lg border border-slate-200">
+               ~₹{(balances.SGD * ((fxRates['INR'] || 83.5) / (fxRates['SGD'] || 1.35))).toLocaleString(undefined, {maximumFractionDigits: 2})} at current rate
+            </p>
+          </div>
           
-          <div className="flex gap-4">
-            <button onClick={() => {setFromCurrency('SGD'); setActiveModal('convert');}} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}><RefreshCw size={16} /> Convert to INR</button>
-            <button onClick={() => setActiveModal('receive')} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}><ArrowDownLeft size={16} /> Receive</button>
+          <div className="flex gap-4 relative z-10">
+             <button onClick={() => { setFromCurrency('SGD'); setActiveModal('convert'); }} className="flex-1 py-4 bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <RefreshCcw className="w-5 h-5" /> Convert to INR
+            </button>
+            <button onClick={() => addToast('Feature Coming Soon', '', 'info')} className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <ArrowDownLeft className="w-5 h-5" /> Receive
+            </button>
           </div>
         </div>
 
       </div>
 
-      {/* MODALS */}
+      {/* Modals */}
       <Modal isOpen={activeModal === 'fund'} onClose={() => setActiveModal(null)} title="Fund INR Wallet">
-        <form onSubmit={handleFund}>
-          <div style={{ padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Building2 size={24} className="text-blue" />
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '14px' }}>HDFC Bank Ltd</div>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Linked Account ending in 4921</div>
-            </div>
+        <form onSubmit={handleFund} className="space-y-6">
+          <div className="bg-brand-50 p-6 rounded-2xl border border-brand-100 flex items-center gap-4">
+             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
+                <ArrowDownLeft className="w-6 h-6 text-brand-600" />
+             </div>
+             <div>
+               <p className="text-sm font-bold text-brand-900">Pull from HDFC Bank</p>
+               <p className="text-xs font-medium text-brand-700 mt-1">Account ending in 4921</p>
+             </div>
           </div>
-          <div className="form-group mb-6">
-            <label className="form-label">Amount (INR)</label>
-            <input type="number" className="form-input" placeholder="₹ 1,00,000" value={amount} onChange={e => setAmount(e.target.value)} required />
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Amount to pull (₹)</label>
+            <input type="number" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl text-xl focus:outline-none focus:border-brand-500 font-bold" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} required />
           </div>
-          <button type="submit" className="btn btn-primary w-full">Pull Funds</button>
+          <button type="submit" className="w-full py-4 bg-brand-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-brand-500/30">Confirm Funding</button>
         </form>
       </Modal>
 
-      <Modal isOpen={activeModal === 'withdraw'} onClose={() => setActiveModal(null)} title="Withdraw to Bank">
-        <form onSubmit={handleWithdraw}>
-          <div className="form-group mb-6">
-            <label className="form-label">Amount (INR)</label>
-            <input type="number" className="form-input" placeholder={`Max: ₹${balances.INR}`} value={amount} onChange={e => setAmount(e.target.value)} required />
+      <Modal isOpen={activeModal === 'withdraw'} onClose={() => setActiveModal(null)} title="Withdraw INR">
+        <form onSubmit={handleWithdraw} className="space-y-6">
+          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center gap-4">
+             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-200">
+                <ArrowUpRight className="w-6 h-6 text-slate-600" />
+             </div>
+             <div>
+               <p className="text-sm font-bold text-slate-900">Send to HDFC Bank</p>
+               <p className="text-xs font-medium text-slate-500 mt-1">Available: ₹{balances.INR.toLocaleString()}</p>
+             </div>
           </div>
-          <button type="submit" className="btn btn-primary w-full">Initiate Withdrawal</button>
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Amount to withdraw (₹)</label>
+            <input type="number" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl text-xl focus:outline-none focus:border-slate-400 font-bold" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} required />
+          </div>
+          <button type="submit" className="w-full py-4 bg-slate-900 text-white font-bold text-lg rounded-2xl shadow-lg shadow-slate-900/20">Confirm Withdrawal</button>
         </form>
       </Modal>
 
       <Modal isOpen={activeModal === 'convert'} onClose={() => setActiveModal(null)} title={`Convert ${fromCurrency} to INR`}>
-        <form onSubmit={handleConvert}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-            <div>
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Live Interbank Rate</div>
-              <div style={{ fontWeight: 600, fontSize: '16px' }}>1 {fromCurrency} = {((fxRates.INR || 83) / (fromCurrency === 'USD' ? 1 : fxRates[fromCurrency])).toFixed(4)} INR</div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Spread ({tier})</div>
-              <div style={{ fontWeight: 600, fontSize: '16px', color: 'var(--primary-blue)' }}>{markupPercent}%</div>
-            </div>
-          </div>
-          
-          <div style={{ padding: '0 16px 16px', display: 'flex', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Client Conversion Rate</div>
-            <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--primary-green)' }}>
-              1 {fromCurrency} = {(((fxRates.INR || 83) / (fromCurrency === 'USD' ? 1 : fxRates[fromCurrency])) * (1 - (markupMultiplier - 1))).toFixed(4)} INR
-            </div>
-          </div>
-          <div className="form-group mb-6">
-            <label className="form-label">Amount to convert ({fromCurrency})</label>
-            <input type="number" className="form-input" placeholder={`Max: ${balances[fromCurrency]}`} value={amount} onChange={e => setAmount(e.target.value)} required />
-          </div>
-          <button type="submit" className="btn btn-primary w-full">Execute Conversion</button>
-        </form>
-      </Modal>
-
-      <Modal isOpen={activeModal === 'receive'} onClose={() => setActiveModal(null)} title="Receive Funds">
-        <p className="text-muted" style={{ marginBottom: '24px', fontSize: '14px' }}>Provide these details to your buyer to receive payments.</p>
-        <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px', border: '1px solid var(--border-glass-solid)' }}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>Bank Name</label>
-            <div style={{ fontWeight: 600, fontSize: '15px' }}>DBS Bank Ltd</div>
-          </div>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>Account Name</label>
-            <div style={{ fontWeight: 600, fontSize: '15px' }}>Frontier Technologies Pvt Ltd</div>
-          </div>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>Account Number</label>
-            <div style={{ fontWeight: 600, fontSize: '15px', fontFamily: 'monospace' }}>8371920045</div>
+        <form onSubmit={handleConvert} className="space-y-6">
+          <div className={`bg-${fromCurrency === 'USD' ? 'emerald' : 'amber'}-50 p-6 rounded-2xl border border-${fromCurrency === 'USD' ? 'emerald' : 'amber'}-100 flex items-center justify-between`}>
+             <div>
+               <p className={`text-sm font-bold text-${fromCurrency === 'USD' ? 'emerald' : 'amber'}-900`}>Available {fromCurrency}</p>
+               <p className={`text-2xl font-mono font-bold text-${fromCurrency === 'USD' ? 'emerald' : 'amber'}-700 mt-1`}>{formatCurrency(balances[fromCurrency], fromCurrency)}</p>
+             </div>
           </div>
           <div>
-            <label style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase' }}>Bank BIC</label>
-            <div style={{ fontWeight: 600, fontSize: '15px', fontFamily: 'monospace' }}>DBSSGSG</div>
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Amount to convert ({fromCurrency})</label>
+            <input type="number" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl text-xl focus:outline-none focus:border-brand-500 font-bold" placeholder="0.00" value={amount} onChange={e => setAmount(e.target.value)} required />
           </div>
-        </div>
+          <button type="submit" className="w-full py-4 bg-brand-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2">
+            Execute Conversion <RefreshCcw className="w-5 h-5" />
+          </button>
+        </form>
       </Modal>
 
     </div>

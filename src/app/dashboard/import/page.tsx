@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useMock, NETWORK_FEE_USD } from '@/lib/MockContext';
-import { ArrowRight, CheckCircle2, Upload, Search, Building2, ShieldCheck, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Upload, Search, Building2, ShieldCheck, Clock, Activity, Loader2 } from 'lucide-react';
 
 export default function ImportPaymentWizard() {
   const { balances, addBalance, addTransaction, addToast, fxRates, counterparties } = useMock();
@@ -81,31 +81,27 @@ export default function ImportPaymentWizard() {
   };
 
   const getStepState = (stepNum: number) => {
-      if (currentStep > stepNum) return 'step-completed';
-      if (currentStep === stepNum) return 'step-active';
-      return 'step-inactive';
-  };
-
-  const getStepLineState = (stepNum: number) => {
-      return currentStep > stepNum ? 'w-full' : (currentStep === stepNum ? 'w-1/2' : 'w-0');
+      if (currentStep > stepNum) return 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] border-emerald-400';
+      if (currentStep === stepNum) return 'bg-brand-600 text-white shadow-[0_0_20px_rgba(2,132,199,0.6)] border-brand-400 ring-4 ring-brand-500/20';
+      return 'bg-white text-slate-400 border-slate-200';
   };
 
   if (isSuccess) {
     return (
       <div className="animate-fade-in flex flex-col items-center justify-center py-20">
-        <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6 border border-emerald-200 shadow-glass">
-          <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+        <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(16,185,129,0.4)] animate-bounce-subtle">
+          <CheckCircle2 className="w-12 h-12 text-white" />
         </div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-4">Transfer Initiated!</h2>
-        <p className="text-slate-500 text-lg mb-8">
-            Transaction ID: <span className="font-mono font-bold text-brand-600">#OUT-{Math.floor(Math.random() * 10000)}</span>
+        <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Transfer Initiated!</h2>
+        <p className="text-slate-500 text-xl mb-10 text-center max-w-md">
+            Transaction ID: <span className="font-mono font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-lg border border-brand-100">#OUT-{Math.floor(Math.random() * 10000)}</span>
         </p>
         
         <div className="flex gap-4">
-          <button onClick={() => window.location.href='/dashboard'} className="px-6 py-3 bg-white text-slate-700 font-medium rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+          <button onClick={() => window.location.href='/dashboard'} className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
               Return to Dashboard
           </button>
-          <button onClick={() => window.location.href='/dashboard/transactions'} className="px-6 py-3 bg-brand-600 text-white font-medium rounded-xl shadow-card-hover hover:bg-brand-700 transition-colors">
+          <button onClick={() => window.location.href='/dashboard/transactions'} className="px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all">
               Track Status
           </button>
         </div>
@@ -114,103 +110,118 @@ export default function ImportPaymentWizard() {
   }
 
   return (
-    <div className="animate-fade-in max-w-4xl mx-auto pb-20">
+    <div className="animate-fade-in max-w-5xl mx-auto pb-20 relative">
       
-      {/* Header */}
-      <header className="mb-10 flex justify-between items-center">
+      {/* Premium Header */}
+      <header className="mb-12 flex justify-between items-center relative z-10">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-            <span className="text-brand-500"><ArrowRight className="w-6 h-6" /></span> 
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-4 tracking-tight">
+            <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+              <ArrowRight className="w-6 h-6" />
+            </div>
             New Outflow Transfer
           </h1>
         </div>
-        <div className="text-right">
+        <div className="text-right glass-panel px-6 py-3 rounded-2xl bg-white/60">
           <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Available INR Balance</p>
-          <p className="text-xl font-mono font-bold text-slate-900">
-            ₹ {(balances['INR'] || 0).toLocaleString()}
+          <p className="text-2xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700">
+            ₹ {(balances['INR'] || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </p>
         </div>
       </header>
 
-      {/* Tailwind Stepper */}
-      <div className="mb-12 relative px-4">
-        <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-200 -translate-y-1/2 z-0 rounded-full"></div>
-        <div className="absolute top-1/2 left-0 h-1 bg-brand-500 -translate-y-1/2 z-0 rounded-full transition-all duration-500" style={{ width: `${((currentStep - 1) / 3) * 100}%` }}></div>
+      {/* Premium Stepper */}
+      <div className="mb-14 relative px-8 z-10">
+        <div className="absolute top-1/2 left-8 right-8 h-1.5 bg-slate-200 -translate-y-1/2 z-0 rounded-full overflow-hidden">
+           <div className="h-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-700 ease-in-out rounded-full" style={{ width: `${((currentStep - 1) / 3) * 100}%` }}></div>
+        </div>
         
         <div className="flex justify-between relative z-10">
             {['Beneficiary', 'Payment', 'Compliance', 'Review'].map((label, i) => {
                 const stepNum = i + 1;
                 return (
                     <div key={stepNum} className="flex flex-col items-center cursor-pointer group" onClick={() => currentStep > stepNum && setCurrentStep(stepNum)}>
-                        <div className={`step-circle mb-2 ${getStepState(stepNum)} group-hover:scale-110 transition-transform`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-2 mb-3 relative group-hover:scale-110 ${getStepState(stepNum)}`}>
                             {currentStep > stepNum ? <CheckCircle2 className="w-5 h-5" /> : stepNum}
                         </div>
-                        <span className={`text-xs font-semibold ${currentStep >= stepNum ? 'text-slate-900' : 'text-slate-400'}`}>{label}</span>
+                        <span className={`text-sm font-bold transition-colors ${currentStep >= stepNum ? 'text-slate-800' : 'text-slate-400'}`}>{label}</span>
                     </div>
                 )
             })}
         </div>
       </div>
 
-      <div>
+      <div className="relative z-10">
         
         {/* STEP 1: BENEFICIARY */}
         {currentStep === 1 && (
-          <div className="glass-panel p-8 rounded-2xl animate-fade-in">
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-xl font-bold text-slate-900">Who are you paying?</h3>
-              <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200 shadow-inner">
-                <button className="px-4 py-1.5 text-xs font-bold bg-white text-brand-600 rounded shadow-sm">Saved</button>
-                <button className="px-4 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700">New</button>
+          <div className="glass-panel p-10 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
+            <div className="flex justify-between items-center mb-10">
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">Who are you paying?</h3>
+                <p className="text-slate-500 font-medium">Select an existing counterparty or add a new one.</p>
+              </div>
+              <div className="flex bg-slate-100/80 p-1.5 rounded-xl border border-slate-200/50 shadow-inner">
+                <button className="px-6 py-2 text-sm font-bold bg-white text-brand-600 rounded-lg shadow-sm">Saved</button>
+                <button className="px-6 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">New</button>
               </div>
             </div>
 
-            <div className="relative mb-8">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <div className="relative mb-8 group">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
               <input 
                 type="text" 
                 placeholder="Search saved partners by name, country, or IBAN..." 
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:shadow-input-focus transition-all"
+                className="w-full pl-14 pr-6 py-4 bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-transparent focus:border-brand-500 rounded-2xl text-base font-medium focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
               {filteredCounterparties.map(c => (
                 <div 
                   key={c.name}
                   onClick={() => setSelectedBene(c)}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedBene?.name === c.name ? 'border-brand-500 bg-brand-50 shadow-input-focus scale-[1.02]' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-glass'}`}
+                  className={`p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 relative overflow-hidden group ${
+                    selectedBene?.name === c.name 
+                      ? 'border-brand-500 bg-brand-50/50 shadow-lg shadow-brand-500/10 scale-[1.02]' 
+                      : 'border-slate-200 bg-white hover:border-brand-300 hover:shadow-xl hover:-translate-y-1'
+                  }`}
                 >
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 border border-slate-200">
+                  {selectedBene?.name === c.name && (
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                  )}
+                  <div className="flex items-center gap-5 mb-4 relative z-10">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-inner ${
+                      selectedBene?.name === c.name ? 'bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-brand-500/40' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 transition-colors'
+                    }`}>
                       {c.name.charAt(0)}
                     </div>
                     <div>
-                      <div className="text-sm font-bold text-slate-900">{c.name}</div>
-                      <div className="text-xs text-slate-500">{c.country}</div>
+                      <div className="text-base font-bold text-slate-900">{c.name}</div>
+                      <div className="text-sm text-slate-500 font-medium">{c.country}</div>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center border-t border-slate-200 pt-3 mt-3">
-                    <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Last: Never</span>
+                  <div className="flex justify-between items-center pt-4 border-t border-slate-100/80 relative z-10">
+                    <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider font-bold">Last TX: Never</span>
                     {selectedBene?.name === c.name ? (
-                      <CheckCircle2 className="w-4 h-4 text-brand-500" />
+                      <CheckCircle2 className="w-5 h-5 text-brand-600 animate-fade-in" />
                     ) : (
-                      <div className="w-4 h-4 rounded-full border-2 border-slate-200" />
+                      <div className="w-5 h-5 rounded-full border-2 border-slate-200 group-hover:border-brand-300 transition-colors" />
                     )}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-slate-100">
+            <div className="flex justify-end pt-6 border-t border-slate-200/60">
               <button 
                 onClick={() => setCurrentStep(2)} 
                 disabled={!selectedBene}
-                className="px-8 py-3 bg-brand-600 text-white font-medium rounded-xl flex items-center gap-2 shadow-card-hover hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="px-10 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold text-lg rounded-2xl flex items-center gap-3 shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all"
               >
-                Continue <ArrowRight className="w-4 h-4" />
+                Continue <ArrowRight className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -218,54 +229,58 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 2: PAYMENT DETAILS */}
         {currentStep === 2 && (
-          <div className="glass-panel p-8 rounded-2xl animate-fade-in">
-             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-xl font-bold text-slate-900">How much?</h3>
-              <div className="text-right">
+          <div className="glass-panel p-10 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
+             <div className="flex justify-between items-start mb-10">
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">How much to send?</h3>
+                <p className="text-slate-500 font-medium">Enter the exact invoice amount in USD.</p>
+              </div>
+              <div className="text-right bg-slate-50 px-5 py-3 rounded-2xl border border-slate-200/60">
                 <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Live Rate (USD/INR)</p>
-                <p className="text-xl font-mono font-bold text-slate-900 flex items-center gap-2 justify-end">
+                <p className="text-2xl font-mono font-bold text-slate-900 flex items-center gap-3 justify-end">
                   {(fxRates['INR'] || 83.5).toFixed(2)} 
-                  <span className="text-emerald-600 text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-sans">+0.05%</span>
+                  <span className="text-emerald-600 text-xs bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 font-sans shadow-sm">+0.05%</span>
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 mb-10">
               {/* Left Column */}
               <div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm focus-within:shadow-input-focus focus-within:border-brand-500 transition-all">
-                   <div className="flex justify-between text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+                <div className="bg-white border-2 border-slate-200 rounded-[1.5rem] p-8 mb-6 shadow-sm focus-within:shadow-[0_0_25px_rgba(14,165,233,0.15)] focus-within:border-brand-500 transition-all group relative overflow-hidden">
+                   <div className="absolute top-0 left-0 w-1 h-full bg-slate-200 group-focus-within:bg-brand-500 transition-colors"></div>
+                   <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
                      <span>You Send (USD)</span>
                    </div>
                    <div className="flex items-center gap-4">
-                     <span className="text-4xl text-slate-300 font-light">$</span>
+                     <span className="text-5xl text-slate-300 font-light">$</span>
                      <input 
                         type="number"
                         value={amount}
                         onChange={e => setAmount(e.target.value)}
                         placeholder="0.00"
-                        className="bg-transparent text-4xl font-bold w-full outline-none text-slate-900 placeholder-slate-200"
+                        className="bg-transparent text-5xl font-bold w-full outline-none text-slate-900 placeholder-slate-200 tracking-tight"
                      />
                    </div>
                 </div>
 
-                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                  <div className="flex justify-between text-sm mb-3">
+                <div className="bg-gradient-to-b from-slate-50 to-slate-100/50 rounded-[1.5rem] p-8 border border-slate-200/80 shadow-inner">
+                  <div className="flex justify-between text-base mb-4">
                     <span className="text-slate-500 font-medium">Wholesale Rate</span>
-                    <span className="font-mono font-medium text-slate-900">{(fxRates['INR'] || 83.5).toFixed(2)}</span>
+                    <span className="font-mono font-bold text-slate-900">{(fxRates['INR'] || 83.5).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-sm mb-3">
-                    <span className="text-slate-500 font-medium">Platform Fee (0.20%)</span>
-                    <span className="font-mono font-medium text-slate-900">₹ {((inrBaseCost * 0.002)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  <div className="flex justify-between text-base mb-4">
+                    <span className="text-slate-500 font-medium">Platform Fee <span className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-1">0.20%</span></span>
+                    <span className="font-mono font-bold text-slate-900">₹ {((inrBaseCost * 0.002)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                   </div>
-                  <div className="flex justify-between text-sm mb-4">
+                  <div className="flex justify-between text-base mb-6">
                     <span className="text-slate-500 font-medium">Network Wire Fee</span>
-                    <span className="font-mono font-medium text-slate-900">${NETWORK_FEE_USD.toFixed(2)} <span className="text-slate-400 text-xs ml-1">(₹ {networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span></span>
+                    <span className="font-mono font-bold text-slate-900">${NETWORK_FEE_USD.toFixed(2)} <span className="text-slate-400 text-sm ml-1 font-medium">(₹ {networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span></span>
                   </div>
-                  <div className="h-px bg-slate-200 my-4"></div>
+                  <div className="h-px bg-slate-200/80 my-6"></div>
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-slate-900">Total INR to Debit</span>
-                    <span className="font-mono font-bold text-lg text-brand-600">
+                    <span className="font-bold text-slate-900 text-lg">Total INR to Debit</span>
+                    <span className="font-mono font-bold text-2xl text-brand-600">
                       ₹ {invoiceVal ? totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                     </span>
                   </div>
@@ -274,27 +289,31 @@ export default function ImportPaymentWizard() {
 
               {/* Right Column */}
               <div>
-                <div className="bg-white rounded-2xl p-5 border border-slate-200 h-full flex flex-col">
-                  <div className="flex justify-between items-center mb-4">
+                <div className="bg-white rounded-[1.5rem] p-8 border border-slate-200 h-full flex flex-col shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                  
+                  <div className="flex justify-between items-center mb-6 relative z-10">
                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Rate Trend (24h)</h4>
-                     <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-bold border border-emerald-100">Low Volatility</span>
+                     <span className="text-xs text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg font-bold border border-emerald-200 shadow-sm flex items-center gap-1.5">
+                       <Activity className="w-3 h-3" /> Low Volatility
+                     </span>
                   </div>
-                  <div className="flex-1 bg-slate-50 rounded-xl flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-200 font-medium">
-                     [Chart Rendering]
+                  <div className="flex-1 bg-slate-50/50 rounded-2xl flex items-center justify-center text-sm text-slate-400 border-2 border-dashed border-slate-200 font-medium relative z-10">
+                     [Interactive Chart Rendering]
                   </div>
-                  <div className="text-center mt-4">
-                    <p className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1">
-                      <Clock className="w-3 h-3"/> Rate is locked for 60 mins upon confirmation.
+                  <div className="text-center mt-6 relative z-10">
+                    <p className="text-sm text-slate-500 font-medium flex items-center justify-center gap-2 bg-slate-50 py-3 rounded-xl border border-slate-100">
+                      <Clock className="w-4 h-4 text-brand-500"/> Rate is locked for 60 mins upon confirmation.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-between pt-4 border-t border-slate-100">
-              <button onClick={() => setCurrentStep(1)} className="px-6 py-3 text-slate-500 font-medium hover:text-slate-900 transition-colors">Back</button>
-              <button onClick={() => setCurrentStep(3)} disabled={!invoiceVal} className="px-8 py-3 bg-brand-600 text-white font-medium rounded-xl flex items-center gap-2 shadow-card-hover hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                Continue <ArrowRight className="w-4 h-4" />
+            <div className="flex justify-between pt-6 border-t border-slate-200/60">
+              <button onClick={() => setCurrentStep(1)} className="px-8 py-4 text-slate-500 font-bold hover:text-slate-900 transition-colors">Back</button>
+              <button onClick={() => setCurrentStep(3)} disabled={!invoiceVal} className="px-10 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold text-lg rounded-2xl flex items-center gap-3 shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all">
+                Continue <ArrowRight className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -302,15 +321,21 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 3: COMPLIANCE SHIELD */}
         {currentStep === 3 && (
-          <div className="glass-panel p-8 rounded-2xl animate-fade-in">
-             <h3 className="text-xl font-bold text-slate-900 mb-8">Compliance Shield</h3>
+          <div className="glass-panel p-10 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
+             <div className="mb-10">
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-1 flex items-center gap-3">
+                  <ShieldCheck className="w-8 h-8 text-brand-600" />
+                  Compliance Shield
+                </h3>
+                <p className="text-slate-500 font-medium">AI-driven validation to ensure regulatory compliance before execution.</p>
+             </div>
 
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
                {/* Inputs */}
-               <div className="flex flex-col gap-6">
+               <div className="flex flex-col gap-8">
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Purpose of Payment (FEMA)</label>
-                    <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 focus:shadow-input-focus transition-all text-slate-900 font-medium" value={purposeCode} onChange={e => setPurposeCode(e.target.value)}>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Purpose of Payment (FEMA)</label>
+                    <select className="w-full bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-brand-500 focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all text-slate-900 font-bold cursor-pointer appearance-none" value={purposeCode} onChange={e => setPurposeCode(e.target.value)}>
                       <option>P0103 - Advance for Imports</option>
                       <option>P0102 - Settlement of Imports</option>
                       <option>S1107 - Software Consultancy</option>
@@ -319,81 +344,89 @@ export default function ImportPaymentWizard() {
                   </div>
                   
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Invoice Reference</label>
-                    <input type="text" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 focus:shadow-input-focus transition-all text-slate-900 font-medium placeholder-slate-300" value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} placeholder="INV-2026-..." />
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Invoice Reference</label>
+                    <input type="text" className="w-full bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-brand-500 focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all text-slate-900 font-bold placeholder-slate-300" value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} placeholder="INV-2026-..." />
                   </div>
 
-                  <div className={`border-2 border-dashed rounded-2xl p-8 text-center relative cursor-pointer transition-all ${fileAttached ? 'border-emerald-500 bg-emerald-50' : 'border-brand-300 bg-brand-50 hover:bg-brand-100/50'}`}>
+                  <div className={`border-2 border-dashed rounded-[1.5rem] p-10 text-center relative cursor-pointer transition-all duration-300 group ${fileAttached ? 'border-emerald-400 bg-emerald-50/50 shadow-inner' : 'border-slate-300 bg-slate-50 hover:bg-brand-50 hover:border-brand-400'}`}>
                     <input type="file" onChange={handleFileUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                     {!fileAttached ? (
                       <>
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm text-brand-600">
-                          <Upload className="w-5 h-5" />
+                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-200 text-brand-600 group-hover:scale-110 group-hover:shadow-md transition-all">
+                          <Upload className="w-7 h-7" />
                         </div>
-                        <p className="font-bold text-brand-900 text-sm">Upload Invoice / Bill of Entry</p>
-                        <p className="text-xs text-brand-600 mt-1 font-medium">PDF, JPG (Max 5MB)</p>
+                        <p className="font-bold text-slate-900 text-lg mb-1">Upload Invoice Document</p>
+                        <p className="text-sm text-slate-500 font-medium">Drag & drop or click to browse (PDF, JPG)</p>
                       </>
                     ) : (
-                      <>
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm text-emerald-500">
-                          <CheckCircle2 className="w-5 h-5" />
+                      <div className="animate-fade-in">
+                        <div className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
+                          <CheckCircle2 className="w-8 h-8 text-white" />
                         </div>
-                        <p className="font-bold text-emerald-900 text-sm">{invoiceRef || 'Invoice'}.pdf</p>
-                        <p className="text-xs text-emerald-600 mt-1 font-bold">Ready for scan</p>
-                      </>
+                        <p className="font-bold text-emerald-900 text-lg mb-1">{invoiceRef || 'Invoice_Document'}.pdf</p>
+                        <p className="text-sm text-emerald-700 font-bold">Successfully Attached</p>
+                      </div>
                     )}
                   </div>
                </div>
 
                {/* Risk Scan Simulator */}
-               <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
-                  <h4 className="text-sm font-bold text-slate-900 mb-6">Real-time Risk Scan</h4>
+               <div className="bg-slate-900 rounded-[1.5rem] p-8 border border-slate-800 shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
                   
-                  <div className="flex flex-col gap-5">
+                  <div className="flex justify-between items-center mb-8 relative z-10">
+                    <h4 className="text-base font-bold text-white tracking-tight">Real-time Risk Scan</h4>
+                    {isScanning && <Loader2 className="w-5 h-5 text-brand-400 animate-spin" />}
+                  </div>
+                  
+                  <div className="flex flex-col gap-8 relative z-10">
                     {/* OFAC */}
                     <div>
-                      <div className="flex justify-between text-xs font-semibold mb-2">
-                        <span className="text-slate-500">OFAC / Sanctions Check</span>
-                        <span className={scanStep >= 1 ? 'text-emerald-600' : 'text-slate-400'}>{scanStep >= 1 ? 'Passed' : 'Pending'}</span>
+                      <div className="flex justify-between text-sm font-bold mb-3">
+                        <span className="text-slate-300">OFAC / Sanctions Check</span>
+                        <span className={scanStep >= 1 ? 'text-emerald-400' : 'text-slate-500'}>{scanStep >= 1 ? 'Passed' : 'Pending'}</span>
                       </div>
-                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div className={`h-full bg-emerald-500 transition-all duration-700 ease-out ${scanStep >= 1 ? 'w-full' : (isScanning ? 'w-1/2' : 'w-0')}`} />
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                        <div className={`h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(16,185,129,0.8)] ${scanStep >= 1 ? 'w-full' : (isScanning ? 'w-1/2' : 'w-0')}`} />
                       </div>
                     </div>
                     {/* IBAN */}
                     <div>
-                      <div className="flex justify-between text-xs font-semibold mb-2">
-                        <span className="text-slate-500">Beneficiary Bank Validation</span>
-                        <span className={scanStep >= 2 ? 'text-emerald-600' : 'text-slate-400'}>{scanStep >= 2 ? 'Passed' : 'Pending'}</span>
+                      <div className="flex justify-between text-sm font-bold mb-3">
+                        <span className="text-slate-300">Beneficiary Bank Validation</span>
+                        <span className={scanStep >= 2 ? 'text-emerald-400' : 'text-slate-500'}>{scanStep >= 2 ? 'Passed' : 'Pending'}</span>
                       </div>
-                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div className={`h-full bg-emerald-500 transition-all duration-700 ease-out ${scanStep >= 2 ? 'w-full' : (isScanning && scanStep >= 1 ? 'w-1/2' : 'w-0')}`} />
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                        <div className={`h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(16,185,129,0.8)] ${scanStep >= 2 ? 'w-full' : (isScanning && scanStep >= 1 ? 'w-1/2' : 'w-0')}`} />
                       </div>
                     </div>
                     {/* OCR */}
                     <div>
-                      <div className="flex justify-between text-xs font-semibold mb-2">
-                        <span className="text-slate-500">Invoice OCR Match</span>
-                        <span className={scanStep >= 3 ? 'text-emerald-600' : 'text-slate-400'}>{scanStep >= 3 ? 'Passed' : 'Pending'}</span>
+                      <div className="flex justify-between text-sm font-bold mb-3">
+                        <span className="text-slate-300">Invoice OCR Match</span>
+                        <span className={scanStep >= 3 ? 'text-emerald-400' : 'text-slate-500'}>{scanStep >= 3 ? 'Passed' : 'Pending'}</span>
                       </div>
-                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div className={`h-full bg-emerald-500 transition-all duration-700 ease-out ${scanStep >= 3 ? 'w-full' : (isScanning && scanStep >= 2 ? 'w-1/2' : 'w-0')}`} />
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                        <div className={`h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(16,185,129,0.8)] ${scanStep >= 3 ? 'w-full' : (isScanning && scanStep >= 2 ? 'w-1/2' : 'w-0')}`} />
                       </div>
                     </div>
                   </div>
 
                   {scanStep >= 3 && (
-                    <div className="mt-8 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 animate-slide-in">
-                      <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                      <span className="text-xs font-bold text-emerald-800">All Checks Passed. Ready for execution.</span>
+                    <div className="mt-10 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center gap-3 animate-slide-in backdrop-blur-sm">
+                      <ShieldCheck className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-bold text-emerald-300">All Checks Passed</p>
+                        <p className="text-xs text-emerald-400/80 font-medium">Ready for execution</p>
+                      </div>
                     </div>
                   )}
                </div>
              </div>
 
-             <div className="flex justify-between pt-4 border-t border-slate-100">
-              <button onClick={() => setCurrentStep(2)} className="px-6 py-3 text-slate-500 font-medium hover:text-slate-900 transition-colors">Back</button>
-              <button onClick={startRiskScan} disabled={isScanning} className="px-8 py-3 bg-slate-900 text-white font-medium rounded-xl shadow-card-hover hover:bg-slate-800 disabled:opacity-50 disabled:cursor-wait transition-all">
+             <div className="flex justify-between pt-6 border-t border-slate-200/60">
+              <button onClick={() => setCurrentStep(2)} className="px-8 py-4 text-slate-500 font-bold hover:text-slate-900 transition-colors">Back</button>
+              <button onClick={startRiskScan} disabled={isScanning} className="px-10 py-4 bg-slate-900 text-white font-bold text-lg rounded-2xl shadow-xl shadow-slate-900/20 hover:shadow-slate-900/40 disabled:opacity-50 disabled:cursor-wait transition-all hover:-translate-y-0.5">
                 {isScanning ? 'Running Checks...' : 'Run Checks & Continue'}
               </button>
             </div>
@@ -402,50 +435,51 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 4: REVIEW */}
         {currentStep === 4 && (
-          <div className="glass-panel p-12 rounded-2xl animate-fade-in">
-             <div className="text-center mb-10">
-               <div className="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-100 shadow-sm">
-                  <Building2 className="w-7 h-7 text-brand-600" />
+          <div className="glass-panel p-12 rounded-[2rem] bg-white/80 animate-slide-in shadow-xl shadow-slate-200/50 border border-white">
+             <div className="text-center mb-12">
+               <div className="w-20 h-20 bg-brand-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border-2 border-brand-100 shadow-lg shadow-brand-500/10 rotate-3">
+                  <Building2 className="w-10 h-10 text-brand-600 -rotate-3" />
                </div>
-               <h3 className="text-2xl font-bold text-slate-900">Confirm Transfer</h3>
-               <p className="text-slate-500 text-sm mt-2 font-medium">Please review details carefully before authorizing.</p>
+               <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Confirm Transfer</h3>
+               <p className="text-slate-500 text-base mt-3 font-medium max-w-sm mx-auto">Please review the final settlement details carefully before authorizing.</p>
              </div>
 
-             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-10 max-w-xl mx-auto shadow-sm">
-                <div className="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+             <div className="bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden mb-12 max-w-2xl mx-auto shadow-lg shadow-slate-200/50 relative">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-brand-400 to-brand-600"></div>
+                <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center pl-10">
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Amount to Debit</span>
-                  <span className="text-2xl font-mono font-bold text-slate-900">₹ {totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  <span className="text-3xl font-mono font-bold text-slate-900">₹ {totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
-                <div className="p-6 flex flex-col gap-5">
-                  <div className="flex justify-between text-sm">
+                <div className="p-10 flex flex-col gap-6 pl-12">
+                  <div className="flex justify-between text-base">
                     <span className="text-slate-500 font-medium">To</span>
                     <div className="text-right">
-                      <p className="font-bold text-slate-900">{selectedBene?.name}</p>
-                      <p className="text-xs text-slate-400 font-medium mt-0.5">{selectedBene?.account}</p>
+                      <p className="font-bold text-slate-900 text-lg">{selectedBene?.name}</p>
+                      <p className="text-sm text-slate-400 font-medium mt-1">{selectedBene?.account}</p>
                     </div>
                   </div>
-                  <div className="flex justify-between text-sm items-center">
+                  <div className="flex justify-between text-base items-center">
                     <span className="text-slate-500 font-medium">Bank</span>
-                    <span className="font-medium text-slate-900">{selectedBene?.country} Bank</span>
+                    <span className="font-bold text-slate-900">{selectedBene?.country} Bank</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-base">
                     <span className="text-slate-500 font-medium">Fee Breakdown</span>
                     <div className="text-right">
-                      <p className="font-mono font-medium text-slate-900">${NETWORK_FEE_USD.toFixed(2)} <span className="text-xs text-slate-400 font-sans ml-1">(Fixed)</span></p>
-                      <p className="font-mono font-medium text-slate-900 mt-1">0.20% <span className="text-xs text-slate-400 font-sans ml-1">(FX Margin)</span></p>
+                      <p className="font-mono font-bold text-slate-900">${NETWORK_FEE_USD.toFixed(2)} <span className="text-xs text-slate-400 font-sans ml-1 font-medium">(Fixed)</span></p>
+                      <p className="font-mono font-bold text-slate-900 mt-2">0.20% <span className="text-xs text-slate-400 font-sans ml-1 font-medium">(FX Margin)</span></p>
                     </div>
                   </div>
-                  <div className="flex justify-between text-sm items-center pt-2 border-t border-slate-100">
+                  <div className="flex justify-between text-base items-center pt-6 mt-2 border-t border-slate-100">
                     <span className="text-slate-500 font-medium">Value Date</span>
-                    <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">T+0 (Today)</span>
+                    <span className="font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg shadow-sm">T+0 (Today)</span>
                   </div>
                 </div>
              </div>
 
-             <div className="flex justify-center gap-4">
-                <button onClick={() => setCurrentStep(3)} className="px-8 py-3 bg-white border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors shadow-sm">Edit</button>
-                <button onClick={handleConfirmPay} className="px-10 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-card-hover hover:bg-emerald-600 flex items-center gap-2 transition-colors">
-                  Confirm & Pay <CheckCircle2 className="w-5 h-5" />
+             <div className="flex justify-center gap-6">
+                <button onClick={() => setCurrentStep(3)} className="px-10 py-4 bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-sm">Edit Details</button>
+                <button onClick={handleConfirmPay} className="px-12 py-4 bg-gradient-to-r from-emerald-500 to-emerald-400 text-white font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 flex items-center gap-3 transition-all">
+                  Authorize & Pay <CheckCircle2 className="w-6 h-6" />
                 </button>
              </div>
           </div>
