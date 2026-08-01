@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Twitter, Linkedin, Github } from "lucide-react";
+import { ArrowRight, MessageCircle, Globe, Mail } from "lucide-react";
 
 export default function PublicLayout({
   children,
@@ -73,13 +73,13 @@ export default function PublicLayout({
               
               <div className="flex items-center gap-4">
                 <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-500 hover:text-white transition-all text-slate-400">
-                  <Twitter className="w-4 h-4" />
+                  <MessageCircle className="w-4 h-4" />
                 </a>
                 <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-500 hover:text-white transition-all text-slate-400">
-                  <Linkedin className="w-4 h-4" />
+                  <Globe className="w-4 h-4" />
                 </a>
                 <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-500 hover:text-white transition-all text-slate-400">
-                  <Github className="w-4 h-4" />
+                  <Mail className="w-4 h-4" />
                 </a>
               </div>
             </div>
