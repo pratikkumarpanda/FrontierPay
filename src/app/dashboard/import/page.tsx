@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useMock, NETWORK_FEE_USD } from '@/lib/MockContext';
 import { ArrowRight, CheckCircle2, Upload, Search, Building2, ShieldCheck, Clock } from 'lucide-react';
 
@@ -13,7 +13,7 @@ export default function ImportPaymentWizard() {
   
   // Step 2: Payment
   const [amount, setAmount] = useState('');
-  const markupMultiplier = 1.002; // 0.2% markup for demo
+  const markupMultiplier = 1.002; 
   const invoiceVal = parseFloat(amount) || 0;
   const inrBaseCost = invoiceVal * (fxRates['INR'] || 83.5);
   const networkFeeInr = NETWORK_FEE_USD * (fxRates['INR'] || 83.5);
@@ -49,12 +49,12 @@ export default function ImportPaymentWizard() {
     setIsScanning(true);
     setScanStep(0);
     
-    setTimeout(() => setScanStep(1), 800); // OFAC Check
-    setTimeout(() => setScanStep(2), 1600); // IBAN Validation
+    setTimeout(() => setScanStep(1), 800); 
+    setTimeout(() => setScanStep(2), 1600); 
     setTimeout(() => {
-      setScanStep(3); // OCR Match
+      setScanStep(3); 
       setIsScanning(false);
-      setCurrentStep(4); // Move to Review
+      setCurrentStep(4); 
     }, 2500);
   };
 
@@ -66,10 +66,8 @@ export default function ImportPaymentWizard() {
       return;
     }
     
-    // Deduct INR
     addBalance('INR', -totalInrToDebit);
     
-    // Add Transaction record
     addTransaction({
       id: `TX-${Math.floor(Math.random() * 10000)}`,
       date: new Date().toISOString().split('T')[0],
@@ -82,146 +80,137 @@ export default function ImportPaymentWizard() {
     setIsSuccess(true);
   };
 
-  // Helper styles for stepper
-  const getStepClass = (step: number) => {
-    if (currentStep > step) return { bg: '#10b981', text: 'white', border: '#10b981' }; // Completed (Green)
-    if (currentStep === step) return { bg: 'var(--primary-blue)', text: 'white', border: 'var(--primary-blue)', shadow: '0 0 0 4px rgba(14,165,233,0.2)' }; // Active
-    return { bg: 'white', text: 'var(--text-muted)', border: 'var(--border-glass-solid)' }; // Inactive
+  const getStepState = (stepNum: number) => {
+      if (currentStep > stepNum) return 'step-completed';
+      if (currentStep === stepNum) return 'step-active';
+      return 'step-inactive';
   };
 
-  const progressWidth = ((currentStep - 1) / 3) * 100;
+  const getStepLineState = (stepNum: number) => {
+      return currentStep > stepNum ? 'w-full' : (currentStep === stepNum ? 'w-1/2' : 'w-0');
+  };
 
   if (isSuccess) {
     return (
       <div className="animate-fade-in flex flex-col items-center justify-center py-20">
-        <div style={{ width: '80px', height: '80px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', border: '1px solid #a7f3d0' }}>
-          <CheckCircle2 size={40} style={{ color: '#10b981' }} />
+        <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6 border border-emerald-200 shadow-glass">
+          <CheckCircle2 className="w-10 h-10 text-emerald-500" />
         </div>
-        <h2 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px' }}>Transfer Initiated!</h2>
-        <p className="text-muted" style={{ fontSize: '18px', marginBottom: '32px' }}>Transaction ID: <span style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--primary-blue)' }}>#OUT-{Math.floor(Math.random() * 10000)}</span></p>
+        <h2 className="text-3xl font-bold text-slate-900 mb-4">Transfer Initiated!</h2>
+        <p className="text-slate-500 text-lg mb-8">
+            Transaction ID: <span className="font-mono font-bold text-brand-600">#OUT-{Math.floor(Math.random() * 10000)}</span>
+        </p>
         
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <button onClick={() => window.location.href='/dashboard'} className="btn" style={{ background: 'white', color: 'var(--text-primary)', border: '1px solid var(--border-glass-solid)' }}>Return to Dashboard</button>
-          <button onClick={() => window.location.href='/dashboard/transactions'} className="btn btn-primary">Track Status</button>
+        <div className="flex gap-4">
+          <button onClick={() => window.location.href='/dashboard'} className="px-6 py-3 bg-white text-slate-700 font-medium rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+              Return to Dashboard
+          </button>
+          <button onClick={() => window.location.href='/dashboard/transactions'} className="px-6 py-3 bg-brand-600 text-white font-medium rounded-xl shadow-card-hover hover:bg-brand-700 transition-colors">
+              Track Status
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '100px' }}>
+    <div className="animate-fade-in max-w-4xl mx-auto pb-20">
       
       {/* Header */}
-      <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <header className="mb-10 flex justify-between items-center">
         <div>
-          <h1 style={{ fontSize: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ color: 'var(--primary-blue)' }}><ArrowRight size={24} /></span> New Outflow Transfer
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+            <span className="text-brand-500"><ArrowRight className="w-6 h-6" /></span> 
+            New Outflow Transfer
           </h1>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <p style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Available INR Balance</p>
-          <p style={{ fontSize: '18px', fontWeight: 700, fontFamily: 'monospace' }}>
+        <div className="text-right">
+          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Available INR Balance</p>
+          <p className="text-xl font-mono font-bold text-slate-900">
             ₹ {(balances['INR'] || 0).toLocaleString()}
           </p>
         </div>
       </header>
 
-      {/* Stepper */}
-      <div style={{ maxWidth: '800px', margin: '0 auto 48px auto', position: 'relative' }}>
-        {/* Connecting Line */}
-        <div style={{ position: 'absolute', top: '50%', left: '0', width: '100%', height: '2px', background: 'var(--border-glass-solid)', zIndex: 0, transform: 'translateY(-50%)' }} />
-        {/* Active Line */}
-        <div style={{ position: 'absolute', top: '50%', left: '0', width: `${progressWidth}%`, height: '2px', background: 'var(--primary-blue)', zIndex: 0, transform: 'translateY(-50%)', transition: 'width 0.3s ease' }} />
+      {/* Tailwind Stepper */}
+      <div className="mb-12 relative px-4">
+        <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-200 -translate-y-1/2 z-0 rounded-full"></div>
+        <div className="absolute top-1/2 left-0 h-1 bg-brand-500 -translate-y-1/2 z-0 rounded-full transition-all duration-500" style={{ width: `${((currentStep - 1) / 3) * 100}%` }}></div>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', zIndex: 10 }}>
-          {['Beneficiary', 'Payment', 'Compliance', 'Review'].map((label, i) => {
-            const step = i + 1;
-            const styles = getStepClass(step);
-            return (
-              <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', cursor: currentStep > step ? 'pointer' : 'default' }} onClick={() => currentStep > step && setCurrentStep(step)}>
-                <div style={{ 
-                  width: '40px', height: '40px', borderRadius: '50%', 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                  background: styles.bg, color: styles.text, border: `2px solid ${styles.border}`,
-                  boxShadow: styles.shadow || 'none', fontWeight: 600, transition: 'all 0.3s ease'
-                }}>
-                  {currentStep > step ? <CheckCircle2 size={20} /> : step}
-                </div>
-                <p style={{ fontSize: '12px', fontWeight: currentStep === step ? 700 : 500, color: currentStep >= step ? 'var(--text-primary)' : 'var(--text-muted)' }}>{label}</p>
-              </div>
-            );
-          })}
+        <div className="flex justify-between relative z-10">
+            {['Beneficiary', 'Payment', 'Compliance', 'Review'].map((label, i) => {
+                const stepNum = i + 1;
+                return (
+                    <div key={stepNum} className="flex flex-col items-center cursor-pointer group" onClick={() => currentStep > stepNum && setCurrentStep(stepNum)}>
+                        <div className={`step-circle mb-2 ${getStepState(stepNum)} group-hover:scale-110 transition-transform`}>
+                            {currentStep > stepNum ? <CheckCircle2 className="w-5 h-5" /> : stepNum}
+                        </div>
+                        <span className={`text-xs font-semibold ${currentStep >= stepNum ? 'text-slate-900' : 'text-slate-400'}`}>{label}</span>
+                    </div>
+                )
+            })}
         </div>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <div>
         
         {/* STEP 1: BENEFICIARY */}
         {currentStep === 1 && (
-          <div className="glass-panel" style={{ padding: '32px', animation: 'fadeIn 0.3s ease' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 700 }}>Who are you paying?</h3>
-              <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '8px', border: '1px solid var(--border-glass-solid)' }}>
-                <button style={{ padding: '4px 12px', fontSize: '12px', fontWeight: 600, background: 'white', color: 'var(--primary-blue)', borderRadius: '4px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>Saved</button>
-                <button style={{ padding: '4px 12px', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>New</button>
+          <div className="glass-panel p-8 rounded-2xl animate-fade-in">
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl font-bold text-slate-900">Who are you paying?</h3>
+              <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200 shadow-inner">
+                <button className="px-4 py-1.5 text-xs font-bold bg-white text-brand-600 rounded shadow-sm">Saved</button>
+                <button className="px-4 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700">New</button>
               </div>
             </div>
 
-            <div style={{ position: 'relative', marginBottom: '24px' }}>
-              <Search size={18} style={{ position: 'absolute', left: '16px', top: '14px', color: 'var(--text-muted)' }} />
+            <div className="relative mb-8">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Search saved partners by name, country, or IBAN..." 
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '12px', border: '1px solid var(--border-glass-solid)', background: '#f8fafc', fontSize: '14px' }} 
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:shadow-input-focus transition-all"
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               {filteredCounterparties.map(c => (
                 <div 
                   key={c.name}
                   onClick={() => setSelectedBene(c)}
-                  style={{ 
-                    padding: '16px', 
-                    borderRadius: '12px', 
-                    border: `2px solid ${selectedBene?.name === c.name ? 'var(--primary-blue)' : 'var(--border-glass-solid)'}`,
-                    background: 'white',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: selectedBene?.name === c.name ? '0 0 0 4px rgba(14,165,233,0.1)' : 'none'
-                  }}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedBene?.name === c.name ? 'border-brand-500 bg-brand-50 shadow-input-focus scale-[1.02]' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-glass'}`}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--text-muted)' }}>
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 border border-slate-200">
                       {c.name.charAt(0)}
                     </div>
                     <div>
-                      <div style={{ fontSize: '14px', fontWeight: 600 }}>{c.name}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.country}</div>
+                      <div className="text-sm font-bold text-slate-900">{c.name}</div>
+                      <div className="text-xs text-slate-500">{c.country}</div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Last: Never</span>
+                  <div className="flex justify-between items-center border-t border-slate-200 pt-3 mt-3">
+                    <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Last: Never</span>
                     {selectedBene?.name === c.name ? (
-                      <CheckCircle2 size={16} style={{ color: 'var(--primary-blue)' }} />
+                      <CheckCircle2 className="w-4 h-4 text-brand-500" />
                     ) : (
-                      <div style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid var(--border-glass-solid)' }} />
+                      <div className="w-4 h-4 rounded-full border-2 border-slate-200" />
                     )}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div className="flex justify-end pt-4 border-t border-slate-100">
               <button 
                 onClick={() => setCurrentStep(2)} 
                 disabled={!selectedBene}
-                className="btn btn-primary" 
-                style={{ padding: '12px 32px', opacity: selectedBene ? 1 : 0.5 }}
+                className="px-8 py-3 bg-brand-600 text-white font-medium rounded-xl flex items-center gap-2 shadow-card-hover hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                Continue <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+                Continue <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -229,51 +218,54 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 2: PAYMENT DETAILS */}
         {currentStep === 2 && (
-          <div className="glass-panel" style={{ padding: '32px', animation: 'fadeIn 0.3s ease' }}>
-             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 700 }}>How much?</h3>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>Live Rate (USD/INR)</p>
-                <p style={{ fontSize: '18px', fontWeight: 700, fontFamily: 'monospace' }}>{(fxRates['INR'] || 83.5).toFixed(2)} <span style={{ color: '#10b981', fontSize: '12px', background: '#ecfdf5', padding: '2px 6px', borderRadius: '4px' }}>+0.05%</span></p>
+          <div className="glass-panel p-8 rounded-2xl animate-fade-in">
+             <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl font-bold text-slate-900">How much?</h3>
+              <div className="text-right">
+                <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Live Rate (USD/INR)</p>
+                <p className="text-xl font-mono font-bold text-slate-900 flex items-center gap-2 justify-end">
+                  {(fxRates['INR'] || 83.5).toFixed(2)} 
+                  <span className="text-emerald-600 text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-sans">+0.05%</span>
+                </p>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               {/* Left Column */}
               <div>
-                <div style={{ background: 'white', border: '1px solid var(--border-glass-solid)', borderRadius: '16px', padding: '24px', marginBottom: '24px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm focus-within:shadow-input-focus focus-within:border-brand-500 transition-all">
+                   <div className="flex justify-between text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
                      <span>You Send (USD)</span>
                    </div>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                     <span style={{ fontSize: '24px', color: 'var(--text-muted)', fontWeight: 300 }}>$</span>
+                   <div className="flex items-center gap-4">
+                     <span className="text-4xl text-slate-300 font-light">$</span>
                      <input 
                         type="number"
                         value={amount}
                         onChange={e => setAmount(e.target.value)}
                         placeholder="0.00"
-                        style={{ border: 'none', background: 'transparent', fontSize: '36px', fontWeight: 700, width: '100%', outline: 'none' }}
+                        className="bg-transparent text-4xl font-bold w-full outline-none text-slate-900 placeholder-slate-200"
                      />
                    </div>
                 </div>
 
-                <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '16px', border: '1px solid var(--border-glass-solid)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '12px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Wholesale Rate</span>
-                    <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{(fxRates['INR'] || 83.5).toFixed(2)}</span>
+                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                  <div className="flex justify-between text-sm mb-3">
+                    <span className="text-slate-500 font-medium">Wholesale Rate</span>
+                    <span className="font-mono font-medium text-slate-900">{(fxRates['INR'] || 83.5).toFixed(2)}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '12px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Platform Fee (0.20%)</span>
-                    <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>₹ {((inrBaseCost * 0.002)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  <div className="flex justify-between text-sm mb-3">
+                    <span className="text-slate-500 font-medium">Platform Fee (0.20%)</span>
+                    <span className="font-mono font-medium text-slate-900">₹ {((inrBaseCost * 0.002)).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '12px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Network Wire Fee</span>
-                    <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>${NETWORK_FEE_USD.toFixed(2)} (₹ {networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
+                  <div className="flex justify-between text-sm mb-4">
+                    <span className="text-slate-500 font-medium">Network Wire Fee</span>
+                    <span className="font-mono font-medium text-slate-900">${NETWORK_FEE_USD.toFixed(2)} <span className="text-slate-400 text-xs ml-1">(₹ {networkFeeInr.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span></span>
                   </div>
-                  <div style={{ height: '1px', background: 'var(--border-glass-solid)', margin: '12px 0' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px' }}>
-                    <span style={{ fontWeight: 700 }}>Total INR to Debit</span>
-                    <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary-blue)' }}>
+                  <div className="h-px bg-slate-200 my-4"></div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-900">Total INR to Debit</span>
+                    <span className="font-mono font-bold text-lg text-brand-600">
                       ₹ {invoiceVal ? totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                     </span>
                   </div>
@@ -282,25 +274,27 @@ export default function ImportPaymentWizard() {
 
               {/* Right Column */}
               <div>
-                <div style={{ background: 'white', borderRadius: '16px', padding: '16px', border: '1px solid var(--border-glass-solid)', height: '100%' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                     <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Rate Trend (24h)</h4>
-                     <span style={{ fontSize: '10px', color: '#10b981', background: '#ecfdf5', padding: '4px 8px', borderRadius: '12px', fontWeight: 700 }}>Low Volatility</span>
+                <div className="bg-white rounded-2xl p-5 border border-slate-200 h-full flex flex-col">
+                  <div className="flex justify-between items-center mb-4">
+                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Rate Trend (24h)</h4>
+                     <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-bold border border-emerald-100">Low Volatility</span>
                   </div>
-                  <div style={{ height: '150px', background: '#f8fafc', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '12px', border: '1px dashed var(--border-glass-solid)' }}>
+                  <div className="flex-1 bg-slate-50 rounded-xl flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-200 font-medium">
                      [Chart Rendering]
                   </div>
-                  <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}><Clock size={12} style={{ display: 'inline', marginRight: '4px' }}/>Rate is locked for 60 mins upon confirmation.</p>
+                  <div className="text-center mt-4">
+                    <p className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1">
+                      <Clock className="w-3 h-3"/> Rate is locked for 60 mins upon confirmation.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <button onClick={() => setCurrentStep(1)} className="btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)' }}>Back</button>
-              <button onClick={() => setCurrentStep(3)} disabled={!invoiceVal} className="btn btn-primary" style={{ padding: '12px 32px', opacity: invoiceVal ? 1 : 0.5 }}>
-                Continue <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+            <div className="flex justify-between pt-4 border-t border-slate-100">
+              <button onClick={() => setCurrentStep(1)} className="px-6 py-3 text-slate-500 font-medium hover:text-slate-900 transition-colors">Back</button>
+              <button onClick={() => setCurrentStep(3)} disabled={!invoiceVal} className="px-8 py-3 bg-brand-600 text-white font-medium rounded-xl flex items-center gap-2 shadow-card-hover hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                Continue <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -308,15 +302,15 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 3: COMPLIANCE SHIELD */}
         {currentStep === 3 && (
-          <div className="glass-panel" style={{ padding: '32px', animation: 'fadeIn 0.3s ease' }}>
-             <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '24px' }}>Compliance Shield</h3>
+          <div className="glass-panel p-8 rounded-2xl animate-fade-in">
+             <h3 className="text-xl font-bold text-slate-900 mb-8">Compliance Shield</h3>
 
-             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                {/* Inputs */}
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  <div className="form-group">
-                    <label className="form-label">Purpose of Payment (FEMA)</label>
-                    <select className="form-select" value={purposeCode} onChange={e => setPurposeCode(e.target.value)}>
+               <div className="flex flex-col gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Purpose of Payment (FEMA)</label>
+                    <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 focus:shadow-input-focus transition-all text-slate-900 font-medium" value={purposeCode} onChange={e => setPurposeCode(e.target.value)}>
                       <option>P0103 - Advance for Imports</option>
                       <option>P0102 - Settlement of Imports</option>
                       <option>S1107 - Software Consultancy</option>
@@ -324,93 +318,82 @@ export default function ImportPaymentWizard() {
                     </select>
                   </div>
                   
-                  <div className="form-group">
-                    <label className="form-label">Invoice Reference</label>
-                    <input type="text" className="form-input" value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} placeholder="INV-2026-..." />
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Invoice Reference</label>
+                    <input type="text" className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 focus:shadow-input-focus transition-all text-slate-900 font-medium placeholder-slate-300" value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} placeholder="INV-2026-..." />
                   </div>
 
-                  <div 
-                    style={{ 
-                      border: '2px dashed var(--primary-blue)', 
-                      background: '#f0f9ff',
-                      borderRadius: '16px', 
-                      padding: '32px', 
-                      textAlign: 'center',
-                      position: 'relative',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <input type="file" onChange={handleFileUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                  <div className={`border-2 border-dashed rounded-2xl p-8 text-center relative cursor-pointer transition-all ${fileAttached ? 'border-emerald-500 bg-emerald-50' : 'border-brand-300 bg-brand-50 hover:bg-brand-100/50'}`}>
+                    <input type="file" onChange={handleFileUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                     {!fileAttached ? (
                       <>
-                        <div style={{ width: '48px', height: '48px', background: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
-                          <Upload size={20} style={{ color: 'var(--primary-blue)' }} />
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm text-brand-600">
+                          <Upload className="w-5 h-5" />
                         </div>
-                        <p style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Upload Invoice / Bill of Entry</p>
-                        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>PDF, JPG (Max 5MB)</p>
+                        <p className="font-bold text-brand-900 text-sm">Upload Invoice / Bill of Entry</p>
+                        <p className="text-xs text-brand-600 mt-1 font-medium">PDF, JPG (Max 5MB)</p>
                       </>
                     ) : (
                       <>
-                        <div style={{ width: '48px', height: '48px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto' }}>
-                          <CheckCircle2 size={20} style={{ color: '#10b981' }} />
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm text-emerald-500">
+                          <CheckCircle2 className="w-5 h-5" />
                         </div>
-                        <p style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{invoiceRef || 'Invoice'}.pdf</p>
-                        <p style={{ fontSize: '12px', color: '#10b981', fontWeight: 600, marginTop: '4px' }}>Ready for scan</p>
+                        <p className="font-bold text-emerald-900 text-sm">{invoiceRef || 'Invoice'}.pdf</p>
+                        <p className="text-xs text-emerald-600 mt-1 font-bold">Ready for scan</p>
                       </>
                     )}
                   </div>
                </div>
 
                {/* Risk Scan Simulator */}
-               <div style={{ background: '#f8fafc', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-glass-solid)' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '24px' }}>Real-time Risk Scan</h4>
+               <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                  <h4 className="text-sm font-bold text-slate-900 mb-6">Real-time Risk Scan</h4>
                   
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div className="flex flex-col gap-5">
                     {/* OFAC */}
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
-                        <span style={{ color: 'var(--text-muted)' }}>OFAC / Sanctions Check</span>
-                        <span style={{ color: scanStep >= 1 ? '#10b981' : 'var(--text-muted)' }}>{scanStep >= 1 ? 'Passed' : 'Pending'}</span>
+                      <div className="flex justify-between text-xs font-semibold mb-2">
+                        <span className="text-slate-500">OFAC / Sanctions Check</span>
+                        <span className={scanStep >= 1 ? 'text-emerald-600' : 'text-slate-400'}>{scanStep >= 1 ? 'Passed' : 'Pending'}</span>
                       </div>
-                      <div style={{ width: '100%', height: '6px', background: 'var(--border-glass-solid)', borderRadius: '3px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', background: '#10b981', width: scanStep >= 1 ? '100%' : (isScanning ? '50%' : '0%'), transition: 'width 0.8s ease' }} />
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className={`h-full bg-emerald-500 transition-all duration-700 ease-out ${scanStep >= 1 ? 'w-full' : (isScanning ? 'w-1/2' : 'w-0')}`} />
                       </div>
                     </div>
                     {/* IBAN */}
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
-                        <span style={{ color: 'var(--text-muted)' }}>Beneficiary Bank Validation</span>
-                        <span style={{ color: scanStep >= 2 ? '#10b981' : 'var(--text-muted)' }}>{scanStep >= 2 ? 'Passed' : 'Pending'}</span>
+                      <div className="flex justify-between text-xs font-semibold mb-2">
+                        <span className="text-slate-500">Beneficiary Bank Validation</span>
+                        <span className={scanStep >= 2 ? 'text-emerald-600' : 'text-slate-400'}>{scanStep >= 2 ? 'Passed' : 'Pending'}</span>
                       </div>
-                      <div style={{ width: '100%', height: '6px', background: 'var(--border-glass-solid)', borderRadius: '3px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', background: '#10b981', width: scanStep >= 2 ? '100%' : (isScanning && scanStep >= 1 ? '50%' : '0%'), transition: 'width 0.8s ease' }} />
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className={`h-full bg-emerald-500 transition-all duration-700 ease-out ${scanStep >= 2 ? 'w-full' : (isScanning && scanStep >= 1 ? 'w-1/2' : 'w-0')}`} />
                       </div>
                     </div>
                     {/* OCR */}
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '8px' }}>
-                        <span style={{ color: 'var(--text-muted)' }}>Invoice OCR Match</span>
-                        <span style={{ color: scanStep >= 3 ? '#10b981' : 'var(--text-muted)' }}>{scanStep >= 3 ? 'Passed' : 'Pending'}</span>
+                      <div className="flex justify-between text-xs font-semibold mb-2">
+                        <span className="text-slate-500">Invoice OCR Match</span>
+                        <span className={scanStep >= 3 ? 'text-emerald-600' : 'text-slate-400'}>{scanStep >= 3 ? 'Passed' : 'Pending'}</span>
                       </div>
-                      <div style={{ width: '100%', height: '6px', background: 'var(--border-glass-solid)', borderRadius: '3px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', background: '#10b981', width: scanStep >= 3 ? '100%' : (isScanning && scanStep >= 2 ? '50%' : '0%'), transition: 'width 0.8s ease' }} />
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className={`h-full bg-emerald-500 transition-all duration-700 ease-out ${scanStep >= 3 ? 'w-full' : (isScanning && scanStep >= 2 ? 'w-1/2' : 'w-0')}`} />
                       </div>
                     </div>
                   </div>
 
                   {scanStep >= 3 && (
-                    <div style={{ marginTop: '24px', padding: '12px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <ShieldCheck size={16} style={{ color: '#10b981' }} />
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#047857' }}>All Checks Passed. Ready for execution.</span>
+                    <div className="mt-8 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 animate-slide-in">
+                      <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                      <span className="text-xs font-bold text-emerald-800">All Checks Passed. Ready for execution.</span>
                     </div>
                   )}
                </div>
              </div>
 
-             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <button onClick={() => setCurrentStep(2)} className="btn" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)' }}>Back</button>
-              <button onClick={startRiskScan} disabled={isScanning} className="btn btn-primary" style={{ padding: '12px 32px', background: '#0f172a' }}>
+             <div className="flex justify-between pt-4 border-t border-slate-100">
+              <button onClick={() => setCurrentStep(2)} className="px-6 py-3 text-slate-500 font-medium hover:text-slate-900 transition-colors">Back</button>
+              <button onClick={startRiskScan} disabled={isScanning} className="px-8 py-3 bg-slate-900 text-white font-medium rounded-xl shadow-card-hover hover:bg-slate-800 disabled:opacity-50 disabled:cursor-wait transition-all">
                 {isScanning ? 'Running Checks...' : 'Run Checks & Continue'}
               </button>
             </div>
@@ -419,50 +402,50 @@ export default function ImportPaymentWizard() {
 
         {/* STEP 4: REVIEW */}
         {currentStep === 4 && (
-          <div className="glass-panel" style={{ padding: '48px 32px', animation: 'fadeIn 0.3s ease' }}>
-             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-               <div style={{ width: '64px', height: '64px', background: '#f0f9ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', border: '1px solid #bae6fd' }}>
-                  <Building2 size={24} style={{ color: 'var(--primary-blue)' }} />
+          <div className="glass-panel p-12 rounded-2xl animate-fade-in">
+             <div className="text-center mb-10">
+               <div className="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand-100 shadow-sm">
+                  <Building2 className="w-7 h-7 text-brand-600" />
                </div>
-               <h3 style={{ fontSize: '24px', fontWeight: 700 }}>Confirm Transfer</h3>
-               <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>Please review details carefully before authorizing.</p>
+               <h3 className="text-2xl font-bold text-slate-900">Confirm Transfer</h3>
+               <p className="text-slate-500 text-sm mt-2 font-medium">Please review details carefully before authorizing.</p>
              </div>
 
-             <div style={{ background: 'white', borderRadius: '16px', border: '1px solid var(--border-glass-solid)', overflow: 'hidden', marginBottom: '32px', maxWidth: '600px', margin: '0 auto 32px auto' }}>
-                <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-glass-solid)', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Amount to Debit</span>
-                  <span style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'monospace' }}>₹ {totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-10 max-w-xl mx-auto shadow-sm">
+                <div className="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Amount to Debit</span>
+                  <span className="text-2xl font-mono font-bold text-slate-900">₹ {totalInrToDebit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
-                <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>To</span>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontWeight: 700 }}>{selectedBene?.name}</p>
-                      <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{selectedBene?.account}</p>
+                <div className="p-6 flex flex-col gap-5">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500 font-medium">To</span>
+                    <div className="text-right">
+                      <p className="font-bold text-slate-900">{selectedBene?.name}</p>
+                      <p className="text-xs text-slate-400 font-medium mt-0.5">{selectedBene?.account}</p>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Bank</span>
-                    <span>{selectedBene?.country} Bank</span>
+                  <div className="flex justify-between text-sm items-center">
+                    <span className="text-slate-500 font-medium">Bank</span>
+                    <span className="font-medium text-slate-900">{selectedBene?.country} Bank</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Fee Breakdown</span>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontFamily: 'monospace' }}>${NETWORK_FEE_USD.toFixed(2)} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(Fixed)</span></p>
-                      <p style={{ fontFamily: 'monospace' }}>0.20% <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(FX Margin)</span></p>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500 font-medium">Fee Breakdown</span>
+                    <div className="text-right">
+                      <p className="font-mono font-medium text-slate-900">${NETWORK_FEE_USD.toFixed(2)} <span className="text-xs text-slate-400 font-sans ml-1">(Fixed)</span></p>
+                      <p className="font-mono font-medium text-slate-900 mt-1">0.20% <span className="text-xs text-slate-400 font-sans ml-1">(FX Margin)</span></p>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Value Date</span>
-                    <span style={{ fontWeight: 700 }}>T+0 (Today)</span>
+                  <div className="flex justify-between text-sm items-center pt-2 border-t border-slate-100">
+                    <span className="text-slate-500 font-medium">Value Date</span>
+                    <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">T+0 (Today)</span>
                   </div>
                 </div>
              </div>
 
-             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-                <button onClick={() => setCurrentStep(3)} className="btn" style={{ background: 'white', border: '1px solid var(--border-glass-solid)', padding: '12px 32px' }}>Edit</button>
-                <button onClick={handleConfirmPay} className="btn btn-primary" style={{ background: '#10b981', padding: '12px 32px', width: '250px' }}>
-                  Confirm & Pay <CheckCircle2 size={16} style={{ marginLeft: '8px' }} />
+             <div className="flex justify-center gap-4">
+                <button onClick={() => setCurrentStep(3)} className="px-8 py-3 bg-white border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors shadow-sm">Edit</button>
+                <button onClick={handleConfirmPay} className="px-10 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-card-hover hover:bg-emerald-600 flex items-center gap-2 transition-colors">
+                  Confirm & Pay <CheckCircle2 className="w-5 h-5" />
                 </button>
              </div>
           </div>
