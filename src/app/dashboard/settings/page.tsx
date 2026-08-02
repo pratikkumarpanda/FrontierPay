@@ -6,11 +6,19 @@ import { useMock } from '@/lib/MockContext';
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'kyc' | 'api'>('profile');
   const [copied, setCopied] = useState(false);
-  const { addToast } = useMock();
+  const { addToast, companyProfile, updateCompanyProfile, currentUser } = useMock();
+  
+  const [localProfile, setLocalProfile] = useState(companyProfile);
+  const isOwner = currentUser?.role === 'Owner';
 
   const handleCopy = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+  
+  const handleSaveProfile = () => {
+    updateCompanyProfile(localProfile);
+    addToast('Profile Saved', 'Your company information has been updated.', 'success');
   };
 
   return (
@@ -77,17 +85,35 @@ export default function SettingsPage() {
             {/* PROFILE TAB */}
             {activeTab === 'profile' && (
               <div className="animate-fade-in">
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-8">Company Information</h2>
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Company Information</h2>
+                  {!isOwner && (
+                    <span className="bg-amber-50 text-amber-700 px-3 py-1 rounded-lg border border-amber-200 text-xs font-bold shadow-sm">
+                      View Only (Admin)
+                    </span>
+                  )}
+                </div>
                 
                 <div className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Legal Company Name</label>
-                      <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-bold text-slate-900 transition-colors" defaultValue="Frontier Technologies Private Limited" />
+                      <input 
+                        type="text" 
+                        disabled={!isOwner}
+                        value={localProfile.legalName}
+                        onChange={(e) => setLocalProfile({...localProfile, legalName: e.target.value})}
+                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-bold text-slate-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" 
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Registration Type</label>
-                      <select className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-bold text-slate-900 transition-colors appearance-none cursor-pointer">
+                      <select 
+                        disabled={!isOwner}
+                        value={localProfile.registrationType}
+                        onChange={(e) => setLocalProfile({...localProfile, registrationType: e.target.value})}
+                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-bold text-slate-900 transition-colors appearance-none disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
                         <option>Private Limited</option>
                         <option>LLP</option>
                         <option>Proprietorship</option>
@@ -98,24 +124,48 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">GSTIN</label>
-                      <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-mono font-bold text-slate-900 transition-colors" defaultValue="27AADCF1234E1Z5" />
+                      <input 
+                        type="text" 
+                        disabled={!isOwner}
+                        value={localProfile.gstin}
+                        onChange={(e) => setLocalProfile({...localProfile, gstin: e.target.value})}
+                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-mono font-bold text-slate-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" 
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">IEC (Import Export Code)</label>
-                      <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-mono font-bold text-slate-900 transition-colors" defaultValue="0312014567" />
+                      <input 
+                        type="text" 
+                        disabled={!isOwner}
+                        value={localProfile.iec}
+                        onChange={(e) => setLocalProfile({...localProfile, iec: e.target.value})}
+                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-mono font-bold text-slate-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" 
+                      />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Registered Address</label>
-                    <textarea className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-bold text-slate-900 transition-colors resize-none" rows={3} defaultValue="Unit 402, Cyber City,\nGurgaon, Haryana\n122002"></textarea>
+                    <textarea 
+                      disabled={!isOwner}
+                      value={localProfile.address}
+                      onChange={(e) => setLocalProfile({...localProfile, address: e.target.value})}
+                      className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-brand-500 font-bold text-slate-900 transition-colors resize-none disabled:opacity-60 disabled:cursor-not-allowed" 
+                      rows={3} 
+                    ></textarea>
                   </div>
 
-                  <div className="pt-6 border-t border-slate-200/60 flex justify-end">
-                    <button type="button" onClick={() => addToast('Profile Saved', 'Your company information has been updated.', 'success')} className="px-10 py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-brand-500/40 transition-all hover:-translate-y-0.5">
-                      Save Changes
-                    </button>
-                  </div>
+                  {isOwner ? (
+                    <div className="pt-6 border-t border-slate-200/60 flex justify-end">
+                      <button type="button" onClick={handleSaveProfile} className="px-10 py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-brand-500/40 transition-all hover:-translate-y-0.5">
+                        Save Changes
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="pt-6 border-t border-slate-200/60 flex justify-end">
+                      <p className="text-sm font-medium text-slate-500">Only the Company Owner can modify these details.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

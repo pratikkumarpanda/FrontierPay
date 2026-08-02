@@ -4,13 +4,15 @@ import { Search, Bell, ChevronDown } from 'lucide-react';
 import { useMock } from '@/lib/MockContext';
 
 export default function TopBar() {
-  const { transactions } = useMock();
+  const { transactions, currentUser, setCurrentUserRole } = useMock();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -20,6 +22,9 @@ export default function TopBar() {
       }
       if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
         setIsNotifOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -128,16 +133,44 @@ export default function TopBar() {
             <div className="w-px h-6 bg-slate-200 hidden lg:block"></div>
 
             {/* User Menu */}
-            <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold overflow-hidden">
-                    FT
+            <div className="relative" ref={userMenuRef}>
+              <button 
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold overflow-hidden">
+                      {currentUser?.name?.charAt(0) || 'F'}
+                  </div>
+                  <div className="hidden lg:block text-left">
+                      <p className="text-sm font-semibold text-slate-900">{currentUser?.name}</p>
+                      <p className="text-xs text-slate-500">{currentUser?.role}</p>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 hidden lg:block transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* User Dropdown */}
+              {isUserMenuOpen && (
+                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-glass border border-slate-200 z-50 overflow-hidden animate-slide-in">
+                  <div className="p-3 border-b border-slate-100 bg-slate-50">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Test Mode</p>
+                  </div>
+                  <div className="p-2">
+                    <button 
+                      onClick={() => { setCurrentUserRole('Owner'); setIsUserMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${currentUser?.role === 'Owner' ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50'}`}
+                    >
+                      Simulate Owner Role
+                    </button>
+                    <button 
+                      onClick={() => { setCurrentUserRole('Admin'); setIsUserMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${currentUser?.role === 'Admin' ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50'}`}
+                    >
+                      Simulate Admin Role
+                    </button>
+                  </div>
                 </div>
-                <div className="hidden lg:block text-left">
-                    <p className="text-sm font-semibold text-slate-900">Frontier Tech</p>
-                    <p className="text-xs text-slate-500">Admin</p>
-                </div>
-                <ChevronDown className="w-4 h-4 text-slate-400 hidden lg:block" />
-            </button>
+              )}
+            </div>
         </div>
     </header>
   );

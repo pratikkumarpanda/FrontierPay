@@ -19,6 +19,30 @@ export type WebhookLog = {
   payload: any;
 };
 
+export type UserRole = 'Owner' | 'Admin' | 'Viewer';
+
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+};
+
+export type CompanyProfile = {
+  legalName: string;
+  registrationType: string;
+  gstin: string;
+  iec: string;
+  address: string;
+};
+
+export type TeamMember = {
+  id: string;
+  email: string;
+  role: UserRole;
+  status: 'Active' | 'Pending';
+};
+
 export type Balances = {
   INR: number;
   USD: number;
@@ -91,6 +115,13 @@ interface MockContextType {
   addToast: (title: string, message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
   useCredit: (type: 'invoiceFinancing' | 'payLater', amount: number) => void;
+  
+  currentUser: UserProfile;
+  companyProfile: CompanyProfile;
+  teamMembers: TeamMember[];
+  setCurrentUserRole: (role: UserRole) => void;
+  updateCompanyProfile: (profile: Partial<CompanyProfile>) => void;
+  inviteTeamMember: (email: string, role: UserRole) => void;
 }
 
 const MockContext = createContext<MockContextType | undefined>(undefined);
@@ -103,6 +134,26 @@ export function MockProvider({ children }: { children: ReactNode }) {
     EUR: 0,
     GBP: 0,
   });
+
+  const [currentUser, setCurrentUser] = useState<UserProfile>({
+    id: 'u-self',
+    name: 'Frontier Tech',
+    email: 'founder@frontiertech.com',
+    role: 'Owner'
+  });
+
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile>({
+    legalName: "Frontier Technologies Private Limited",
+    registrationType: "Private Limited",
+    gstin: "27AADCF1234E1Z5",
+    iec: "0312014567",
+    address: "Unit 402, Cyber City,\nGurgaon, Haryana\n122002"
+  });
+
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
+    { id: 'u1', email: 'founder@frontiertech.com', role: 'Owner', status: 'Active' },
+    { id: 'u2', email: 'finance@frontiertech.com', role: 'Admin', status: 'Active' },
+  ]);
 
   const [creditLimits, setCreditLimits] = useState<CreditLimits>({
     invoiceFinancing: { limit: 500000, used: 125000 },
@@ -243,10 +294,23 @@ export function MockProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const setCurrentUserRole = (role: UserRole) => {
+    setCurrentUser(prev => ({ ...prev, role }));
+  };
+
+  const updateCompanyProfile = (profile: Partial<CompanyProfile>) => {
+    setCompanyProfile(prev => ({ ...prev, ...profile }));
+  };
+
+  const inviteTeamMember = (email: string, role: UserRole) => {
+    setTeamMembers(prev => [...prev, { id: `u${Math.random()}`, email, role, status: 'Pending' }]);
+  };
+
   return (
     <MockContext.Provider value={{ 
       balances, transactions, cards, counterparties, fxRates, toasts, webhookLogs, tier, markupMultiplier, creditLimits, setTier, setTransactions,
-      deductBalance, addBalance, addTransaction, issueCard, toggleCardStatus, addCounterparty, addToast, removeToast, useCredit
+      deductBalance, addBalance, addTransaction, issueCard, toggleCardStatus, addCounterparty, addToast, removeToast, useCredit,
+      currentUser, companyProfile, teamMembers, setCurrentUserRole, updateCompanyProfile, inviteTeamMember
     }}>
       {children}
     </MockContext.Provider>

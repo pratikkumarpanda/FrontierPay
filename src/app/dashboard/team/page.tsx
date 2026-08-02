@@ -5,22 +5,19 @@ import { Plus, User, Shield, Mail } from 'lucide-react';
 import Modal from '@/components/Modal';
 
 export default function TeamPage() {
-  const { addToast } = useMock();
+  const { addToast, teamMembers, inviteTeamMember, currentUser } = useMock();
   const [activeModal, setActiveModal] = useState<'invite' | null>(null);
   
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('Viewer');
+  const [role, setRole] = useState<'Admin' | 'Viewer'>('Viewer');
 
-  const [members, setMembers] = useState([
-    { id: 'u1', email: 'founder@frontiertech.com', role: 'Admin', status: 'Active' },
-    { id: 'u2', email: 'finance@frontiertech.com', role: 'Editor', status: 'Active' },
-  ]);
+  const isOwner = currentUser?.role === 'Owner';
 
   const handleInvite = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     
-    setMembers([...members, { id: `u${Math.random()}`, email, role, status: 'Pending' }]);
+    inviteTeamMember(email, role);
     addToast('Invitation Sent', `An invitation has been sent to ${email}.`, 'success');
     setActiveModal(null);
     setEmail('');
@@ -33,9 +30,11 @@ export default function TeamPage() {
           <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Team & Roles</h1>
           <p className="text-muted">Manage access control and corporate permissions.</p>
         </div>
-        <button onClick={() => setActiveModal('invite')} className="btn btn-primary">
-          <Plus size={16} /> Invite Member
-        </button>
+        {isOwner && (
+          <button onClick={() => setActiveModal('invite')} className="btn btn-primary">
+            <Plus size={16} /> Invite Member
+          </button>
+        )}
       </header>
 
       <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 overflow-hidden">
@@ -49,7 +48,7 @@ export default function TeamPage() {
             </tr>
           </thead>
           <tbody>
-            {members.map(user => (
+            {teamMembers.map(user => (
               <tr key={user.id}>
                 <td style={{ fontWeight: 500 }} className="flex items-center gap-3">
                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#eff6ff', color: 'var(--primary-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -88,9 +87,8 @@ export default function TeamPage() {
           </div>
           <div className="form-group mb-6">
             <label className="form-label">Corporate Role</label>
-            <select className="form-select" value={role} onChange={e => setRole(e.target.value)}>
+            <select className="form-select" value={role} onChange={e => setRole(e.target.value as 'Admin' | 'Viewer')}>
               <option value="Admin">Admin (Full Access)</option>
-              <option value="Editor">Editor (Can initiate payments)</option>
               <option value="Viewer">Viewer (Read-only)</option>
             </select>
           </div>
