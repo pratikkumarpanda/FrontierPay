@@ -9,6 +9,11 @@ import ayushkaImg2 from '../../../public/images/ayushka-crafts-2.jpg';
 import ayushkaImg3 from '../../../public/images/ayushka-crafts-3.jpg';
 import ayushkaImg4 from '../../../public/images/ayushka-crafts-4.jpg';
 import ayushkaImg5 from '../../../public/images/ayushka-crafts-5.jpg';
+import pattachitraImg1 from '../../../public/images/house-of-pattachitra-1.jpg';
+import pattachitraImg2 from '../../../public/images/house-of-pattachitra-2.jpg';
+import pattachitraImg3 from '../../../public/images/house-of-pattachitra-3.jpg';
+import pattachitraImg4 from '../../../public/images/house-of-pattachitra-4.jpg';
+import pattachitraImg5 from '../../../public/images/house-of-pattachitra-5.jpg';
 
 function ImageSlideshow({ images, alt }: { images: any[], alt: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -270,6 +275,13 @@ export default function Home() {
                 name: "Ayushman Parida",
                 role: "Owner, Ayushka Crafts",
                 images: [ayushkaImg1, ayushkaImg2, ayushkaImg3, ayushkaImg4, ayushkaImg5]
+              },
+              {
+                headline: "Preserving art across borders",
+                quote: "As a handcrafted saree brand serving customers across borders, reliable international payments are essential. FrontierPay has made the process seamless with fast settlements, transparent pricing, and dependable service, allowing us to focus on preserving and sharing the art of Pattachitra.",
+                name: "Rasmita Sahu",
+                role: "Owner, House Of Pattachitra",
+                images: [pattachitraImg1, pattachitraImg2, pattachitraImg3, pattachitraImg4, pattachitraImg5]
               }
             ].map((t, i) => (
               <div key={i} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden group col-span-1 md:col-span-2">
