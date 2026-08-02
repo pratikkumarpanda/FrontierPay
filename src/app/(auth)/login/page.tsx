@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import Image from 'next/image';
+import Logo from '@/components/Logo';
 import { ArrowRight, Loader2, Key } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -29,14 +29,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-10 z-10 bg-white/60 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] relative">
         <div className="flex justify-center mb-8">
           <Link href="/" className="flex items-center justify-center">
-            <Image
-              src="/logo.png"
-              alt="FrontierPay"
-              width={200}
-              height={50}
-              className="h-12 w-auto object-contain"
-              priority
-            />
+            <Logo height={48} />
           </Link>
         </div>
 

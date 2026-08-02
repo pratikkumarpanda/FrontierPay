@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Logo from "@/components/Logo";
 import { ArrowRight, MessageCircle, Globe, Mail } from "lucide-react";
 
 export default function PublicLayout({
@@ -15,14 +15,7 @@ export default function PublicLayout({
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
           <Link href="/" className="flex items-center group">
-            <Image
-              src="/logo.png"
-              alt="FrontierPay"
-              width={160}
-              height={40}
-              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
-              priority
-            />
+            <Logo height={36} className="group-hover:scale-105 transition-transform" />
           </Link>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
@@ -59,13 +52,7 @@ export default function PublicLayout({
             
             <div className="col-span-2 lg:col-span-2">
               <Link href="/" className="flex items-center mb-6">
-                <Image
-                  src="/logo.png"
-                  alt="FrontierPay"
-                  width={140}
-                  height={36}
-                  className="h-9 w-auto object-contain brightness-0 invert"
-                />
+                <Logo height={32} white className="opacity-90 hover:opacity-100 transition-opacity" />
               </Link>
               <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-xs">
                 The financial operating system for modern global businesses. Built for scale, security, and speed.
