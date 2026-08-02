@@ -216,295 +216,64 @@ export default function Home() {
       </section>
 
 
-      {/* ── Testimonials ── */}
-      <section className="py-32 relative z-10 overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-brand-100/30 blur-[120px] rounded-full pointer-events-none" />
-
-        <div className="relative z-10">
-          {/* Heading */}
-          <div className="text-center max-w-3xl mx-auto px-6 mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-amber-200 text-amber-600 text-sm font-bold mb-6 shadow-sm">
-              <span className="text-base">★★★★★</span> Loved by exporters
-            </div>
+      {/* ── Testimonials (Ground Reports) ── */}
+      <section className="py-32 relative z-10 overflow-hidden bg-slate-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5">
-              Real businesses. Real savings.
+              Ground Reports
             </h2>
             <p className="text-xl text-slate-500 leading-relaxed">
-              Thousands of Indian exporters trust FrontierPay to move money smarter.
+              Real stories from SMEs growing globally with FrontierPay.
             </p>
           </div>
 
-          {/* Row 1 — left to right */}
-          <div className="overflow-hidden mb-6">
-            <div className="marquee-track">
-              {[
-                {
-                  name: "Riya Sharma",
-                  role: "CEO, NexaTextiles Pvt Ltd",
-                  quote: "FrontierPay cut our FX costs by 2.3% overnight. We save over ₹18L a month just on remittances. Incredible platform.",
-                  stars: 5,
-                  color: "from-brand-500 to-brand-700",
-                  img: null,
-                },
-                {
-                  name: "Arjun Mehta",
-                  role: "CFO, GlobalSoft Solutions",
-                  quote: "The compliance automation alone is worth it. Form 15CA/CB used to take our CA 3 days — now it's instant.",
-                  stars: 5,
-                  color: "from-emerald-500 to-emerald-700",
-                  img: null,
-                },
-                {
-                  name: "Priya Nair",
-                  role: "Founder, SpiceTrade Exports",
-                  quote: "I was skeptical about T+0 settlement but it works. My buyers in Dubai receive confirmation before I even close my laptop.",
-                  stars: 5,
-                  color: "from-purple-500 to-purple-700",
-                  img: null,
-                },
-                {
-                  name: "Rohan Gupta",
-                  role: "Director, Vertex Engineering",
-                  quote: "EEFC accounts let us park USD when the rate is bad. We converted at 84.2 last month instead of 82.1 — that's real alpha.",
-                  stars: 5,
-                  color: "from-rose-500 to-rose-700",
-                  img: null,
-                },
-                {
-                  name: "Sneha Kapoor",
-                  role: "Head of Finance, Orbit Pharma",
-                  quote: "The corporate cards funded by EEFC balances changed everything. No more conversion fees for SaaS subscriptions.",
-                  stars: 5,
-                  color: "from-indigo-500 to-indigo-700",
-                  img: null,
-                },
-                {
-                  name: "Karthik Iyer",
-                  role: "MD, Chennai Shipping Co.",
-                  quote: "Support team is genuinely brilliant. Had a complex DTAA query resolved in under 30 minutes on a Sunday.",
-                  stars: 5,
-                  color: "from-amber-500 to-amber-700",
-                  img: null,
-                },
-              ].concat([
-                {
-                  name: "Riya Sharma",
-                  role: "CEO, NexaTextiles Pvt Ltd",
-                  quote: "FrontierPay cut our FX costs by 2.3% overnight. We save over ₹18L a month just on remittances. Incredible platform.",
-                  stars: 5,
-                  color: "from-brand-500 to-brand-700",
-                  img: null,
-                },
-                {
-                  name: "Arjun Mehta",
-                  role: "CFO, GlobalSoft Solutions",
-                  quote: "The compliance automation alone is worth it. Form 15CA/CB used to take our CA 3 days — now it's instant.",
-                  stars: 5,
-                  color: "from-emerald-500 to-emerald-700",
-                  img: null,
-                },
-                {
-                  name: "Priya Nair",
-                  role: "Founder, SpiceTrade Exports",
-                  quote: "I was skeptical about T+0 settlement but it works. My buyers in Dubai receive confirmation before I even close my laptop.",
-                  stars: 5,
-                  color: "from-purple-500 to-purple-700",
-                  img: null,
-                },
-                {
-                  name: "Rohan Gupta",
-                  role: "Director, Vertex Engineering",
-                  quote: "EEFC accounts let us park USD when the rate is bad. We converted at 84.2 last month instead of 82.1 — that's real alpha.",
-                  stars: 5,
-                  color: "from-rose-500 to-rose-700",
-                  img: null,
-                },
-                {
-                  name: "Sneha Kapoor",
-                  role: "Head of Finance, Orbit Pharma",
-                  quote: "The corporate cards funded by EEFC balances changed everything. No more conversion fees for SaaS subscriptions.",
-                  stars: 5,
-                  color: "from-indigo-500 to-indigo-700",
-                  img: null,
-                },
-                {
-                  name: "Karthik Iyer",
-                  role: "MD, Chennai Shipping Co.",
-                  quote: "Support team is genuinely brilliant. Had a complex DTAA query resolved in under 30 minutes on a Sunday.",
-                  stars: 5,
-                  color: "from-amber-500 to-amber-700",
-                  img: null,
-                },
-              ]).map((t, i) => (
-                <div key={i} className="flex-shrink-0 w-[380px] mx-4">
-                  <div className="bg-white border border-slate-200 rounded-[1.5rem] p-7 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 transition-all hover:-translate-y-1 h-full flex flex-col gap-5 relative overflow-hidden group">
-                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${t.color} opacity-5 rounded-full -mr-10 -mt-10 pointer-events-none group-hover:opacity-10 transition-opacity`} />
-                    {/* Stars */}
-                    <div className="flex gap-1">
-                      {Array.from({ length: t.stars }).map((_, s) => (
-                        <span key={s} className="text-amber-400 text-lg">★</span>
-                      ))}
-                    </div>
-                    {/* Quote */}
-                    <p className="text-slate-700 leading-relaxed font-medium flex-1 text-base">
-                      &ldquo;{t.quote}&rdquo;
-                    </p>
-                    {/* Author */}
-                    <div className="flex items-center gap-4 pt-5 border-t border-slate-100">
-                      {/* Avatar — swap src with a real image path when ready */}
-                      <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0`}>
-                        {t.img
-                          ? <img src={t.img} alt={t.name} className="w-full h-full object-cover rounded-full" />
-                          : t.name.charAt(0)
-                        }
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-900 text-sm">{t.name}</p>
-                        <p className="text-slate-500 text-xs font-medium mt-0.5">{t.role}</p>
-                      </div>
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {/* Placeholder Testimonials — waiting for user data */}
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden group">
+                {/* Photo Side */}
+                <div className="md:w-2/5 bg-slate-900 relative min-h-[250px] md:min-h-[auto] flex items-center justify-center overflow-hidden">
+                  {/* Photo Placeholder */}
+                  <div className="absolute inset-0 bg-slate-200 animate-pulse flex flex-col items-center justify-center text-slate-400">
+                    <span className="text-sm font-bold uppercase tracking-widest mb-2">Photo Pending</span>
+                    <span className="text-xs">Upload SME Image</span>
+                  </div>
+                  
+                  {/* Large Quote Mark */}
+                  <div className="absolute top-4 left-4 text-5xl font-serif text-brand-400 opacity-80 z-10">
+                    &ldquo;
+                  </div>
+                  <div className="absolute bottom-4 left-4 z-10">
+                    <span className="text-white/80 font-bold uppercase tracking-[0.2em] text-sm">
+                      TESTIMONIAL
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Row 2 — right to left */}
-          <div className="overflow-hidden">
-            <div className="marquee-track-reverse">
-              {[
-                {
-                  name: "Divya Pillai",
-                  role: "Co-founder, BioMedIndia Exports",
-                  quote: "We moved $2M through FrontierPay last quarter. Not a single failed transaction. Their uptime is truly enterprise-grade.",
-                  stars: 5,
-                  color: "from-teal-500 to-teal-700",
-                  img: null,
-                },
-                {
-                  name: "Vikram Reddy",
-                  role: "Treasury Head, Zenith Metals",
-                  quote: "The OFAC sanctions check runs in real-time before every transfer. Saved us from a potential compliance disaster with a counterparty.",
-                  stars: 5,
-                  color: "from-cyan-500 to-cyan-700",
-                  img: null,
-                },
-                {
-                  name: "Meera Joshi",
-                  role: "Founder, AromaSpice Exports",
-                  quote: "Finally a platform that understands Indian exporters. RoDTEP incentives tracked automatically — it's like having a free CA.",
-                  stars: 5,
-                  color: "from-fuchsia-500 to-fuchsia-700",
-                  img: null,
-                },
-                {
-                  name: "Sanjay Patel",
-                  role: "CFO, Horizon Agro",
-                  quote: "Switched from HDFC trade finance. The rate difference alone more than covers the subscription. ROI was instant.",
-                  stars: 5,
-                  color: "from-orange-500 to-orange-700",
-                  img: null,
-                },
-                {
-                  name: "Ananya Singh",
-                  role: "MD, CraftHouse International",
-                  quote: "The dashboard is beautiful and our accountant loves the automated FIRC reports. Reduced our month-end close from 4 days to 1.",
-                  stars: 5,
-                  color: "from-lime-500 to-lime-700",
-                  img: null,
-                },
-                {
-                  name: "Rahul Desai",
-                  role: "CEO, TechEdge Consulting",
-                  quote: "The developer API is clean and well-documented. We integrated FrontierPay into our ERP in one sprint. Highly recommend.",
-                  stars: 5,
-                  color: "from-sky-500 to-sky-700",
-                  img: null,
-                },
-              ].concat([
-                {
-                  name: "Divya Pillai",
-                  role: "Co-founder, BioMedIndia Exports",
-                  quote: "We moved $2M through FrontierPay last quarter. Not a single failed transaction. Their uptime is truly enterprise-grade.",
-                  stars: 5,
-                  color: "from-teal-500 to-teal-700",
-                  img: null,
-                },
-                {
-                  name: "Vikram Reddy",
-                  role: "Treasury Head, Zenith Metals",
-                  quote: "The OFAC sanctions check runs in real-time before every transfer. Saved us from a potential compliance disaster with a counterparty.",
-                  stars: 5,
-                  color: "from-cyan-500 to-cyan-700",
-                  img: null,
-                },
-                {
-                  name: "Meera Joshi",
-                  role: "Founder, AromaSpice Exports",
-                  quote: "Finally a platform that understands Indian exporters. RoDTEP incentives tracked automatically — it's like having a free CA.",
-                  stars: 5,
-                  color: "from-fuchsia-500 to-fuchsia-700",
-                  img: null,
-                },
-                {
-                  name: "Sanjay Patel",
-                  role: "CFO, Horizon Agro",
-                  quote: "Switched from HDFC trade finance. The rate difference alone more than covers the subscription. ROI was instant.",
-                  stars: 5,
-                  color: "from-orange-500 to-orange-700",
-                  img: null,
-                },
-                {
-                  name: "Ananya Singh",
-                  role: "MD, CraftHouse International",
-                  quote: "The dashboard is beautiful and our accountant loves the automated FIRC reports. Reduced our month-end close from 4 days to 1.",
-                  stars: 5,
-                  color: "from-lime-500 to-lime-700",
-                  img: null,
-                },
-                {
-                  name: "Rahul Desai",
-                  role: "CEO, TechEdge Consulting",
-                  quote: "The developer API is clean and well-documented. We integrated FrontierPay into our ERP in one sprint. Highly recommend.",
-                  stars: 5,
-                  color: "from-sky-500 to-sky-700",
-                  img: null,
-                },
-              ]).map((t, i) => (
-                <div key={i} className="flex-shrink-0 w-[380px] mx-4">
-                  <div className="bg-white border border-slate-200 rounded-[1.5rem] p-7 shadow-sm hover:shadow-xl hover:shadow-slate-200/60 transition-all hover:-translate-y-1 h-full flex flex-col gap-5 relative overflow-hidden group">
-                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${t.color} opacity-5 rounded-full -mr-10 -mt-10 pointer-events-none group-hover:opacity-10 transition-opacity`} />
-                    <div className="flex gap-1">
-                      {Array.from({ length: t.stars }).map((_, s) => (
-                        <span key={s} className="text-amber-400 text-lg">★</span>
-                      ))}
-                    </div>
-                    <p className="text-slate-700 leading-relaxed font-medium flex-1 text-base">
-                      &ldquo;{t.quote}&rdquo;
-                    </p>
-                    <div className="flex items-center gap-4 pt-5 border-t border-slate-100">
-                      <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0`}>
-                        {t.img
-                          ? <img src={t.img} alt={t.name} className="w-full h-full object-cover rounded-full" />
-                          : t.name.charAt(0)
-                        }
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-900 text-sm">{t.name}</p>
-                        <p className="text-slate-500 text-xs font-medium mt-0.5">{t.role}</p>
-                      </div>
+                {/* Content Side */}
+                <div className="md:w-3/5 p-8 flex flex-col justify-center relative">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4 leading-tight">
+                    [Headline for SME]
+                  </h3>
+                  <p className="text-slate-600 mb-8 italic">
+                    "This is a placeholder quote. We will replace this with the actual ground report quote from the SME once provided."
+                  </p>
+                  <div className="flex items-center gap-4 mt-auto">
+                    <div className="w-10 border-t-2 border-brand-500"></div>
+                    <div>
+                      <p className="font-bold text-slate-900">[SME Name]</p>
+                      <p className="text-sm text-slate-500">[Location / Role]</p>
                     </div>
                   </div>
+                  {/* Ending Quote Mark */}
+                  <div className="absolute bottom-6 right-6 text-6xl font-serif text-brand-400 opacity-20 transform translate-y-4">
+                    &rdquo;
+                  </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-
-          {/* Edge fades */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-slate-50 to-transparent z-20" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-slate-50 to-transparent z-20" />
         </div>
       </section>
 
