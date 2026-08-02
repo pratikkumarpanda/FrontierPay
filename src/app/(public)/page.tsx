@@ -47,8 +47,7 @@ export default function Home() {
               {/* Sidebar Preview */}
               <div className="w-64 bg-white/80 border-r border-slate-200 p-6 flex flex-col gap-2">
                 <div className="flex items-center gap-3 mb-8 px-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-brand-600 to-brand-400 rounded-lg shadow-sm"></div>
-                  <span className="font-bold text-slate-900 tracking-tight">FrontierPay</span>
+                  <img src="/logo.png" alt="FrontierPay" className="h-7 w-auto object-contain" />
                 </div>
                 
                 <div className="px-4 py-2.5 bg-brand-50 text-brand-600 rounded-xl text-sm font-bold flex items-center gap-3 shadow-sm border border-brand-100">

@@ -27,14 +27,12 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md p-10 z-10 bg-white/60 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] relative">
         <div className="flex justify-center mb-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative w-10 h-10">
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                <path d="M 20 50 Q 30 20 60 20 L 80 20 Q 50 30 50 50 Z" className="fill-brand-600" />
-                <path d="M 15 75 Q 25 55 50 55 L 70 55 Q 40 65 40 85 Z" className="fill-emerald-500" />
-              </svg>
-            </div>
-            <span className="font-bold text-slate-900 text-2xl tracking-tight">Frontier<span className="text-brand-600">Pay</span></span>
+          <Link href="/" className="flex items-center justify-center">
+            <img
+              src="/logo.png"
+              alt="FrontierPay"
+              className="h-12 w-auto object-contain"
+            />
           </Link>
         </div>
 

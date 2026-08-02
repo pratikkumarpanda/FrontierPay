@@ -13,16 +13,12 @@ export default function PublicLayout({
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-                <path d="M 20 50 Q 30 20 60 20 L 80 20 Q 50 30 50 50 Z" fill="currentColor" />
-                <path d="M 15 75 Q 25 55 50 55 L 70 55 Q 40 65 40 85 Z" fill="rgba(255,255,255,0.7)" />
-              </svg>
-            </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900">
-              Frontier<span className="text-brand-500">Pay</span>
-            </span>
+          <Link href="/" className="flex items-center group">
+            <img
+              src="/logo.png"
+              alt="FrontierPay"
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+            />
           </Link>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
@@ -58,14 +54,12 @@ export default function PublicLayout({
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-20">
             
             <div className="col-span-2 lg:col-span-2">
-              <Link href="/" className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center text-white">
-                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
-                    <path d="M 20 50 Q 30 20 60 20 L 80 20 Q 50 30 50 50 Z" fill="currentColor" />
-                    <path d="M 15 75 Q 25 55 50 55 L 70 55 Q 40 65 40 85 Z" fill="rgba(255,255,255,0.7)" />
-                  </svg>
-                </div>
-                <span className="font-bold text-lg tracking-tight text-white">FrontierPay</span>
+              <Link href="/" className="flex items-center mb-6">
+                <img
+                  src="/logo.png"
+                  alt="FrontierPay"
+                  className="h-9 w-auto object-contain brightness-0 invert"
+                />
               </Link>
               <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-xs">
                 The financial operating system for modern global businesses. Built for scale, security, and speed.

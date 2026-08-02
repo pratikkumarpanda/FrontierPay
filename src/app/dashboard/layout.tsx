@@ -38,16 +38,12 @@ export default function DashboardLayout({
         <aside className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 transition-all duration-300 z-50">
           {/* Logo Area */}
           <div className="h-20 flex items-center px-6 justify-start border-b border-slate-200 relative group cursor-pointer" onClick={() => router.push('/dashboard')}>
-              <div className="w-10 h-10 flex-shrink-0 transition-transform group-hover:scale-105">
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                  <path d="M 20 50 Q 30 20 60 20 L 80 20 Q 50 30 50 50 Z" className="fill-brand-600" />
-                  <path d="M 15 75 Q 25 55 50 55 L 70 55 Q 40 65 40 85 Z" className="fill-emerald-500" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                  <h1 className="text-xl font-display font-bold text-slate-900 tracking-tight">Frontier<span className="text-brand-600">Pay</span></h1>
-                  <p className="text-[10px] text-slate-500 font-mono uppercase tracking-wider group-hover:text-brand-600 transition-colors">Treasury OS v2.4</p>
-              </div>
+              <img
+                src="/logo.png"
+                alt="FrontierPay"
+                className="h-9 w-auto object-contain group-hover:scale-105 transition-transform"
+              />
+              <p className="ml-3 text-[10px] text-slate-500 font-mono uppercase tracking-wider group-hover:text-brand-600 transition-colors">Treasury OS v2.4</p>
           </div>
 
           <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
