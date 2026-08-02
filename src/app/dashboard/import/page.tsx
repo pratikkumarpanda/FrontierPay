@@ -1,9 +1,22 @@
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMock, NETWORK_FEE_USD } from '@/lib/MockContext';
 import { ArrowRight, CheckCircle2, Upload, Search, Building2, ShieldCheck, Clock, Activity, Loader2 } from 'lucide-react';
+import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
+
+const rateData = [
+  { time: '00:00', rate: 83.42 },
+  { time: '04:00', rate: 83.45 },
+  { time: '08:00', rate: 83.40 },
+  { time: '12:00', rate: 83.48 },
+  { time: '16:00', rate: 83.51 },
+  { time: '20:00', rate: 83.49 },
+  { time: '24:00', rate: 83.50 },
+];
 
 export default function ImportPaymentWizard() {
+  const router = useRouter();
   const { balances, addBalance, addTransaction, addToast, fxRates, counterparties } = useMock();
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -13,11 +26,31 @@ export default function ImportPaymentWizard() {
   
   // Step 2: Payment
   const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState('USD');
   const markupMultiplier = 1.002; 
   const invoiceVal = parseFloat(amount) || 0;
-  const inrBaseCost = invoiceVal * (fxRates['INR'] || 83.5);
+  
+  const getRateForCurrency = (curr: string) => {
+    if (curr === 'USD') return fxRates['INR'] || 83.5;
+    const currRate = fxRates[curr] || 1;
+    const inrRate = fxRates['INR'] || 83.5;
+    return inrRate / currRate;
+  }
+  
+  const currentRate = getRateForCurrency(currency);
+  const inrBaseCost = invoiceVal * currentRate;
   const networkFeeInr = NETWORK_FEE_USD * (fxRates['INR'] || 83.5);
   const totalInrToDebit = (inrBaseCost + networkFeeInr) * markupMultiplier;
+
+  const getCurrencySymbol = (curr: string) => {
+    switch (curr) {
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'JPY': return '¥';
+      case 'SGD': return 'S$';
+      default: return '$';
+    }
+  }
 
   // Step 3: Compliance
   const [purposeCode, setPurposeCode] = useState('P0103 - Advance for Imports');
@@ -72,7 +105,7 @@ export default function ImportPaymentWizard() {
       id: `TX-${Math.floor(Math.random() * 10000)}`,
       date: new Date().toISOString().split('T')[0],
       amount: -invoiceVal,
-      currency: 'USD',
+      currency: currency,
       status: 'Processing',
       type: 'Import'
     });
@@ -98,10 +131,10 @@ export default function ImportPaymentWizard() {
         </p>
         
         <div className="flex gap-4">
-          <button onClick={() => window.location.href='/dashboard'} className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+          <button onClick={() => router.push('/dashboard')} className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
               Return to Dashboard
           </button>
-          <button onClick={() => window.location.href='/dashboard/transactions'} className="px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all">
+          <button onClick={() => router.push('/dashboard/transactions')} className="px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all">
               Track Status
           </button>
         </div>
@@ -236,9 +269,9 @@ export default function ImportPaymentWizard() {
                 <p className="text-slate-500 font-medium">Enter the exact invoice amount in USD.</p>
               </div>
               <div className="text-right bg-slate-50 px-5 py-3 rounded-2xl border border-slate-200/60">
-                <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Live Rate (USD/INR)</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Live Rate ({currency}/INR)</p>
                 <p className="text-2xl font-mono font-bold text-slate-900 flex items-center gap-3 justify-end">
-                  {(fxRates['INR'] || 83.5).toFixed(2)} 
+                  {currentRate.toFixed(2)} 
                   <span className="text-emerald-600 text-xs bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 font-sans shadow-sm">+0.05%</span>
                 </p>
               </div>
@@ -249,11 +282,22 @@ export default function ImportPaymentWizard() {
               <div>
                 <div className="bg-white border-2 border-slate-200 rounded-[1.5rem] p-8 mb-6 shadow-sm focus-within:shadow-[0_0_25px_rgba(14,165,233,0.15)] focus-within:border-brand-500 transition-all group relative overflow-hidden">
                    <div className="absolute top-0 left-0 w-1 h-full bg-slate-200 group-focus-within:bg-brand-500 transition-colors"></div>
-                   <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-                     <span>You Send (USD)</span>
+                   <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                     <span>You Send ({currency})</span>
+                     <select 
+                       value={currency} 
+                       onChange={(e) => setCurrency(e.target.value)}
+                       className="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1 outline-none font-bold"
+                     >
+                       <option value="USD">USD</option>
+                       <option value="EUR">EUR</option>
+                       <option value="GBP">GBP</option>
+                       <option value="SGD">SGD</option>
+                       <option value="JPY">JPY</option>
+                     </select>
                    </div>
                    <div className="flex items-center gap-4">
-                     <span className="text-5xl text-slate-300 font-light">$</span>
+                     <span className="text-5xl text-slate-300 font-light">{getCurrencySymbol(currency)}</span>
                      <input 
                         type="number"
                         value={amount}
@@ -267,7 +311,7 @@ export default function ImportPaymentWizard() {
                 <div className="bg-gradient-to-b from-slate-50 to-slate-100/50 rounded-[1.5rem] p-8 border border-slate-200/80 shadow-inner">
                   <div className="flex justify-between text-base mb-4">
                     <span className="text-slate-500 font-medium">Wholesale Rate</span>
-                    <span className="font-mono font-bold text-slate-900">{(fxRates['INR'] || 83.5).toFixed(2)}</span>
+                    <span className="font-mono font-bold text-slate-900">{currentRate.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-base mb-4">
                     <span className="text-slate-500 font-medium">Platform Fee <span className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded ml-1">0.20%</span></span>
@@ -298,8 +342,19 @@ export default function ImportPaymentWizard() {
                        <Activity className="w-3 h-3" /> Low Volatility
                      </span>
                   </div>
-                  <div className="flex-1 bg-slate-50/50 rounded-2xl flex items-center justify-center text-sm text-slate-400 border-2 border-dashed border-slate-200 font-medium relative z-10">
-                     [Interactive Chart Rendering]
+                  <div className="flex-1 rounded-2xl relative z-10 w-full h-[180px] mt-4">
+                     <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={rateData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                           <defs>
+                              <linearGradient id="rateGradient" x1="0" y1="0" x2="0" y2="1">
+                                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                                 <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                              </linearGradient>
+                           </defs>
+                           <YAxis domain={['dataMin - 0.05', 'dataMax + 0.05']} hide />
+                           <Area type="monotone" dataKey="rate" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#rateGradient)" />
+                        </AreaChart>
+                     </ResponsiveContainer>
                   </div>
                   <div className="text-center mt-6 relative z-10">
                     <p className="text-sm text-slate-500 font-medium flex items-center justify-center gap-2 bg-slate-50 py-3 rounded-xl border border-slate-100">
