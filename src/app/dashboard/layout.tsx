@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Logo from '@/components/Logo';
+import Image from 'next/image';
 import { MockProvider } from '@/lib/MockContext';
 import ToastContainer from '@/components/ToastContainer';
 import TopBar from '@/components/TopBar';
@@ -39,7 +39,14 @@ export default function DashboardLayout({
         <aside className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 transition-all duration-300 z-50">
           {/* Logo Area */}
           <div className="h-20 flex items-center px-6 justify-start border-b border-slate-200 relative group cursor-pointer" onClick={() => router.push('/dashboard')}>
-              <Logo height={32} className="group-hover:scale-105 transition-transform" />
+              <Image
+                src="/logo.png"
+                alt="FrontierPay"
+                width={140}
+                height={36}
+                className="h-9 w-auto object-contain group-hover:scale-105 transition-transform"
+                priority
+              />
               <p className="ml-3 text-[10px] text-slate-500 font-mono uppercase tracking-wider group-hover:text-brand-600 transition-colors">Treasury OS v2.4</p>
           </div>
 
