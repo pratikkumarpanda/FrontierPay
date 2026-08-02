@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const router = useRouter();
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<'Owner' | 'Admin'>('Owner');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,6 +64,33 @@ export default function LoginPage() {
             />
           </div>
           
+          <div>
+            <label className="block text-sm font-bold text-slate-900 mb-2">Corporate Email</label>
+            <input 
+              type="email" 
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 placeholder:text-slate-400 font-medium" 
+              placeholder="founder@company.com" 
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-bold text-slate-900">Password</label>
+              <Link href="#" className="text-brand-600 text-sm font-bold hover:text-brand-700 transition-colors">Forgot password?</Link>
+            </div>
+            <input 
+              type="password" 
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-slate-900 placeholder:text-slate-400 font-medium font-mono tracking-widest" 
+              placeholder="••••••••" 
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2">Select Role</label>
             <select 
