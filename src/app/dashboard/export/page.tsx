@@ -1,9 +1,11 @@
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMock } from '@/lib/MockContext';
 import { ArrowLeftRight, CheckCircle2, TrendingUp, ShieldCheck, Zap, Receipt, AlertCircle, Building2 } from 'lucide-react';
 
 export default function ExportReceiptsDecision() {
+  const router = useRouter();
   const { balances, addBalance, addToast } = useMock();
   const [conversionSplit, setConversionSplit] = useState(40); // % to convert to INR
   const [isProcessing, setIsProcessing] = useState(false);
@@ -37,10 +39,10 @@ export default function ExportReceiptsDecision() {
         </p>
         
         <div className="flex gap-4">
-          <button onClick={() => window.location.href='/dashboard/wallets'} className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+          <button onClick={() => router.push('/dashboard/wallets')} className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
             View Wallets
           </button>
-          <button onClick={() => window.location.href='/dashboard/reports'} className="px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all">
+          <button onClick={() => router.push('/dashboard/reports')} className="px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all">
             Download FIRC
           </button>
         </div>

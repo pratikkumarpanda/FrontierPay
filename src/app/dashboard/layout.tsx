@@ -4,7 +4,7 @@ import {
   Settings, LogOut, Wallet, Users, FileText, CreditCard, Code, 
   ShieldCheck, Globe
 } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MockProvider } from '@/lib/MockContext';
 import ToastContainer from '@/components/ToastContainer';
@@ -16,6 +16,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const getLinkClass = (path: string) => {
     return pathname === path 
@@ -36,7 +37,7 @@ export default function DashboardLayout({
         {/* SIDEBAR */}
         <aside className="w-72 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 transition-all duration-300 z-50">
           {/* Logo Area */}
-          <div className="h-20 flex items-center px-6 justify-start border-b border-slate-200 relative group cursor-pointer" onClick={() => window.location.href='/dashboard'}>
+          <div className="h-20 flex items-center px-6 justify-start border-b border-slate-200 relative group cursor-pointer" onClick={() => router.push('/dashboard')}>
               <div className="w-10 h-10 flex-shrink-0 transition-transform group-hover:scale-105">
                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                   <path d="M 20 50 Q 30 20 60 20 L 80 20 Q 50 30 50 50 Z" className="fill-brand-600" />
