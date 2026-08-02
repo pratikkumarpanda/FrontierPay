@@ -3,6 +3,7 @@ import Image from 'next/image';
 import logoImg from '../../../public/logo.png';
 import { ArrowRight, Globe2, ShieldCheck, Zap, Code, Wallet, ArrowRightLeft, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import ayushkaImg from '../../../public/images/ayushka-crafts-2.jpg';
 
 export default function Home() {
   return (
@@ -229,45 +230,48 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {/* Placeholder Testimonials — waiting for user data */}
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden group">
+            {[
+              {
+                headline: "Essential partner in our global growth",
+                quote: "FrontierPay has simplified our international payment process with seamless transactions and dependable service. It's become an essential partner in supporting our global growth.",
+                name: "Ayushman Parida",
+                role: "Owner, Ayushka Crafts",
+                img: ayushkaImg
+              }
+            ].map((t, i) => (
+              <div key={i} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden group col-span-1 md:col-span-2">
                 {/* Photo Side */}
-                <div className="md:w-2/5 bg-slate-900 relative min-h-[250px] md:min-h-[auto] flex items-center justify-center overflow-hidden">
-                  {/* Photo Placeholder */}
-                  <div className="absolute inset-0 bg-slate-200 animate-pulse flex flex-col items-center justify-center text-slate-400">
-                    <span className="text-sm font-bold uppercase tracking-widest mb-2">Photo Pending</span>
-                    <span className="text-xs">Upload SME Image</span>
-                  </div>
+                <div className="md:w-2/5 bg-slate-900 relative min-h-[300px] md:min-h-[400px] flex items-center justify-center overflow-hidden">
+                  <Image src={t.img} alt={t.name} fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                   
                   {/* Large Quote Mark */}
-                  <div className="absolute top-4 left-4 text-5xl font-serif text-brand-400 opacity-80 z-10">
+                  <div className="absolute top-4 left-4 text-5xl font-serif text-brand-400 opacity-90 z-10">
                     &ldquo;
                   </div>
                   <div className="absolute bottom-4 left-4 z-10">
-                    <span className="text-white/80 font-bold uppercase tracking-[0.2em] text-sm">
+                    <span className="text-white font-bold uppercase tracking-[0.2em] text-sm drop-shadow-md">
                       TESTIMONIAL
                     </span>
                   </div>
                 </div>
 
                 {/* Content Side */}
-                <div className="md:w-3/5 p-8 flex flex-col justify-center relative">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-4 leading-tight">
-                    [Headline for SME]
+                <div className="md:w-3/5 p-8 md:p-12 flex flex-col justify-center relative">
+                  <h3 className="text-3xl font-bold text-slate-900 mb-6 leading-tight">
+                    {t.headline}
                   </h3>
-                  <p className="text-slate-600 mb-8 italic">
-                    "This is a placeholder quote. We will replace this with the actual ground report quote from the SME once provided."
+                  <p className="text-lg text-slate-600 mb-10 italic leading-relaxed">
+                    "{t.quote}"
                   </p>
                   <div className="flex items-center gap-4 mt-auto">
-                    <div className="w-10 border-t-2 border-brand-500"></div>
+                    <div className="w-12 border-t-2 border-brand-500"></div>
                     <div>
-                      <p className="font-bold text-slate-900">[SME Name]</p>
-                      <p className="text-sm text-slate-500">[Location / Role]</p>
+                      <p className="font-bold text-slate-900 text-lg">{t.name}</p>
+                      <p className="text-slate-500">{t.role}</p>
                     </div>
                   </div>
                   {/* Ending Quote Mark */}
-                  <div className="absolute bottom-6 right-6 text-6xl font-serif text-brand-400 opacity-20 transform translate-y-4">
+                  <div className="absolute bottom-8 right-8 text-8xl font-serif text-slate-100 opacity-50 transform translate-y-4 pointer-events-none">
                     &rdquo;
                   </div>
                 </div>
