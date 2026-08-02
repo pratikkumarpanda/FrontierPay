@@ -201,6 +201,18 @@ export function MockProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Read from localStorage for the mock login
+    const storedName = localStorage.getItem('frontier_user_name');
+    const storedRole = localStorage.getItem('frontier_user_role') as UserRole;
+    if (storedName && storedRole) {
+      setCurrentUser({
+        id: 'u-self',
+        name: storedName,
+        email: 'user@company.com',
+        role: storedRole
+      });
+    }
+
     const interval = setInterval(() => {
       setTransactions(prev => {
         let hasChanges = false;
