@@ -3,7 +3,40 @@ import Image from 'next/image';
 import logoImg from '../../../public/logo.png';
 import { ArrowRight, Globe2, ShieldCheck, Zap, Code, Wallet, ArrowRightLeft, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
-import ayushkaImg from '../../../public/images/ayushka-crafts-2.jpg';
+import { useState, useEffect } from 'react';
+import ayushkaImg1 from '../../../public/images/ayushka-crafts-1.jpg';
+import ayushkaImg2 from '../../../public/images/ayushka-crafts-2.jpg';
+import ayushkaImg3 from '../../../public/images/ayushka-crafts-3.jpg';
+import ayushkaImg4 from '../../../public/images/ayushka-crafts-4.jpg';
+import ayushkaImg5 from '../../../public/images/ayushka-crafts-5.jpg';
+
+function ImageSlideshow({ images, alt }: { images: any[], alt: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  return (
+    <>
+      {images.map((img, i) => (
+        <Image
+          key={i}
+          src={img}
+          alt={`${alt} photo ${i + 1}`}
+          fill
+          className={`object-cover transition-all duration-1000 ease-in-out ${
+            i === currentIndex ? 'opacity-80 scale-105' : 'opacity-0 scale-100'
+          }`}
+        />
+      ))}
+    </>
+  );
+}
 
 export default function Home() {
   return (
@@ -236,13 +269,13 @@ export default function Home() {
                 quote: "FrontierPay has simplified our international payment process with seamless transactions and dependable service. It's become an essential partner in supporting our global growth.",
                 name: "Ayushman Parida",
                 role: "Owner, Ayushka Crafts",
-                img: ayushkaImg
+                images: [ayushkaImg1, ayushkaImg2, ayushkaImg3, ayushkaImg4, ayushkaImg5]
               }
             ].map((t, i) => (
               <div key={i} className="flex flex-col md:flex-row bg-white rounded-2xl shadow-xl overflow-hidden group col-span-1 md:col-span-2">
                 {/* Photo Side */}
                 <div className="md:w-2/5 bg-slate-900 relative min-h-[300px] md:min-h-[400px] flex items-center justify-center overflow-hidden">
-                  <Image src={t.img} alt={t.name} fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                  <ImageSlideshow images={t.images} alt={t.name} />
                   
                   {/* Large Quote Mark */}
                   <div className="absolute top-4 left-4 text-5xl font-serif text-brand-400 opacity-90 z-10">
