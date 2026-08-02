@@ -23,6 +23,15 @@ export default function ImportPaymentWizard() {
   // Step 1: Beneficiary
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBene, setSelectedBene] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'saved' | 'new'>('saved');
+
+  // New Beneficiary Form state
+  const [newName, setNewName] = useState('');
+  const [newCountry, setNewCountry] = useState('');
+  const [newBank, setNewBank] = useState('');
+  const [newAccount, setNewAccount] = useState('');
+  const [newSwift, setNewSwift] = useState('');
+  const [newFormError, setNewFormError] = useState('');
   
   // Step 2: Payment
   const [amount, setAmount] = useState('');
@@ -71,6 +80,31 @@ export default function ImportPaymentWizard() {
     if (e.target.files && e.target.files.length > 0) {
       setFileAttached(true);
     }
+  };
+
+  const handleAddNewBeneficiary = () => {
+    if (!newName.trim()) {
+      setNewFormError('Beneficiary name is required.');
+      return;
+    }
+    if (!newCountry.trim()) {
+      setNewFormError('Country is required.');
+      return;
+    }
+    if (!newAccount.trim()) {
+      setNewFormError('Account / IBAN is required.');
+      return;
+    }
+    setNewFormError('');
+    const created = {
+      name: newName.trim(),
+      country: newCountry.trim(),
+      account: newAccount.trim(),
+      bank: newBank.trim() || `${newCountry.trim()} Bank`,
+      swift: newSwift.trim(),
+    };
+    setSelectedBene(created);
+    addToast('Beneficiary Added', `"${created.name}" has been set as your beneficiary.`, 'success');
   };
 
   const startRiskScan = () => {
@@ -194,61 +228,201 @@ export default function ImportPaymentWizard() {
                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">Who are you paying?</h3>
                 <p className="text-slate-500 font-medium">Select an existing counterparty or add a new one.</p>
               </div>
+              {/* Saved / New Tab Toggle */}
               <div className="flex bg-slate-100/80 p-1.5 rounded-xl border border-slate-200/50 shadow-inner">
-                <button className="px-6 py-2 text-sm font-bold bg-white text-brand-600 rounded-lg shadow-sm">Saved</button>
-                <button className="px-6 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">New</button>
+                <button
+                  onClick={() => { setActiveTab('saved'); setSelectedBene(null); }}
+                  className={`px-6 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'saved' ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  Saved
+                </button>
+                <button
+                  onClick={() => { setActiveTab('new'); setSelectedBene(null); }}
+                  className={`px-6 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'new' ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  New
+                </button>
               </div>
             </div>
 
-            <div className="relative mb-8 group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
-              <input 
-                type="text" 
-                placeholder="Search saved partners by name, country, or IBAN..." 
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-14 pr-6 py-4 bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-transparent focus:border-brand-500 rounded-2xl text-base font-medium focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
-              />
-            </div>
+            {/* ── SAVED TAB ── */}
+            {activeTab === 'saved' && (
+              <>
+                <div className="relative mb-8 group">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                  <input 
+                    type="text" 
+                    placeholder="Search saved partners by name, country, or IBAN..." 
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="w-full pl-14 pr-6 py-4 bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-transparent focus:border-brand-500 rounded-2xl text-base font-medium focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
+                  />
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
-              {filteredCounterparties.map(c => (
-                <div 
-                  key={c.name}
-                  onClick={() => setSelectedBene(c)}
-                  className={`p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 relative overflow-hidden group ${
-                    selectedBene?.name === c.name 
-                      ? 'border-brand-500 bg-brand-50/50 shadow-lg shadow-brand-500/10 scale-[1.02]' 
-                      : 'border-slate-200 bg-white hover:border-brand-300 hover:shadow-xl hover:-translate-y-1'
-                  }`}
-                >
-                  {selectedBene?.name === c.name && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+                  {filteredCounterparties.map(c => (
+                    <div 
+                      key={c.name}
+                      onClick={() => setSelectedBene(selectedBene?.name === c.name ? null : c)}
+                      className={`p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 relative overflow-hidden group ${
+                        selectedBene?.name === c.name 
+                          ? 'border-brand-500 bg-brand-50/50 shadow-lg shadow-brand-500/10 scale-[1.02]' 
+                          : 'border-slate-200 bg-white hover:border-brand-300 hover:shadow-xl hover:-translate-y-1'
+                      }`}
+                    >
+                      {selectedBene?.name === c.name && (
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                      )}
+                      <div className="flex items-center gap-5 mb-4 relative z-10">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-inner ${
+                          selectedBene?.name === c.name ? 'bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-brand-500/40' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 transition-colors'
+                        }`}>
+                          {c.name.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="text-base font-bold text-slate-900">{c.name}</div>
+                          <div className="text-sm text-slate-500 font-medium">{c.country}</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center pt-4 border-t border-slate-100/80 relative z-10">
+                        <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider font-bold">Last TX: Never</span>
+                        {selectedBene?.name === c.name ? (
+                          <CheckCircle2 className="w-5 h-5 text-brand-600 animate-fade-in" />
+                        ) : (
+                          <div className="w-5 h-5 rounded-full border-2 border-slate-200 group-hover:border-brand-300 transition-colors" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* ── NEW BENEFICIARY TAB ── */}
+            {activeTab === 'new' && (
+              <div className="animate-fade-in">
+                {/* Show a confirmation card if beneficiary was already created */}
+                {selectedBene && (
+                  <div className="mb-8 p-6 rounded-2xl border-2 border-brand-500 bg-brand-50/50 shadow-lg shadow-brand-500/10 flex items-center gap-5 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                  )}
-                  <div className="flex items-center gap-5 mb-4 relative z-10">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-inner ${
-                      selectedBene?.name === c.name ? 'bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-brand-500/40' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 transition-colors'
-                    }`}>
-                      {c.name.charAt(0)}
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center font-bold text-2xl shadow-lg shadow-brand-500/30 flex-shrink-0 relative z-10">
+                      {selectedBene.name.charAt(0)}
+                    </div>
+                    <div className="relative z-10 flex-1">
+                      <p className="text-xs font-bold text-brand-500 uppercase tracking-widest mb-0.5">Beneficiary Set</p>
+                      <p className="text-lg font-bold text-slate-900">{selectedBene.name}</p>
+                      <p className="text-sm text-slate-500 font-medium">{selectedBene.country}{selectedBene.bank ? ` · ${selectedBene.bank}` : ''}</p>
+                    </div>
+                    <CheckCircle2 className="w-7 h-7 text-brand-500 flex-shrink-0 relative z-10" />
+                  </div>
+                )}
+
+                <div className="bg-white rounded-[1.5rem] border border-slate-200 shadow-sm p-8">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-brand-600" />
                     </div>
                     <div>
-                      <div className="text-base font-bold text-slate-900">{c.name}</div>
-                      <div className="text-sm text-slate-500 font-medium">{c.country}</div>
+                      <p className="font-bold text-slate-900 text-base">New Beneficiary Details</p>
+                      <p className="text-sm text-slate-500">Fill in the recipient&apos;s banking information</p>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center pt-4 border-t border-slate-100/80 relative z-10">
-                    <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider font-bold">Last TX: Never</span>
-                    {selectedBene?.name === c.name ? (
-                      <CheckCircle2 className="w-5 h-5 text-brand-600 animate-fade-in" />
-                    ) : (
-                      <div className="w-5 h-5 rounded-full border-2 border-slate-200 group-hover:border-brand-300 transition-colors" />
-                    )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Beneficiary Name */}
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                        Beneficiary Name <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={newName}
+                        onChange={e => setNewName(e.target.value)}
+                        placeholder="e.g. Acme Exports Ltd."
+                        className="w-full bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-slate-200 focus:border-brand-500 rounded-2xl px-5 py-4 text-base font-semibold text-slate-900 placeholder-slate-300 focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
+                      />
+                    </div>
+
+                    {/* Country */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                        Country <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={newCountry}
+                        onChange={e => setNewCountry(e.target.value)}
+                        placeholder="e.g. United States"
+                        className="w-full bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-slate-200 focus:border-brand-500 rounded-2xl px-5 py-4 text-base font-semibold text-slate-900 placeholder-slate-300 focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
+                      />
+                    </div>
+
+                    {/* Bank Name */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                        Bank Name
+                      </label>
+                      <input
+                        type="text"
+                        value={newBank}
+                        onChange={e => setNewBank(e.target.value)}
+                        placeholder="e.g. JPMorgan Chase"
+                        className="w-full bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-slate-200 focus:border-brand-500 rounded-2xl px-5 py-4 text-base font-semibold text-slate-900 placeholder-slate-300 focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
+                      />
+                    </div>
+
+                    {/* Account / IBAN */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                        Account No. / IBAN <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={newAccount}
+                        onChange={e => setNewAccount(e.target.value)}
+                        placeholder="e.g. GB29 NWBK 6016 1331 9268 19"
+                        className="w-full bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-slate-200 focus:border-brand-500 rounded-2xl px-5 py-4 text-base font-mono text-slate-900 placeholder-slate-300 focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
+                      />
+                    </div>
+
+                    {/* SWIFT / BIC */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                        SWIFT / BIC Code
+                      </label>
+                      <input
+                        type="text"
+                        value={newSwift}
+                        onChange={e => setNewSwift(e.target.value.toUpperCase())}
+                        placeholder="e.g. CHASUS33"
+                        maxLength={11}
+                        className="w-full bg-slate-50 hover:bg-slate-100 focus:bg-white border-2 border-slate-200 focus:border-brand-500 rounded-2xl px-5 py-4 text-base font-mono text-slate-900 placeholder-slate-300 focus:outline-none focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)] transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Error */}
+                  {newFormError && (
+                    <p className="mt-4 text-sm font-bold text-rose-600 bg-rose-50 border border-rose-200 px-4 py-3 rounded-xl animate-fade-in">
+                      ⚠ {newFormError}
+                    </p>
+                  )}
+
+                  {/* Add Beneficiary Button */}
+                  <div className="mt-8">
+                    <button
+                      onClick={handleAddNewBeneficiary}
+                      className="w-full py-4 bg-gradient-to-r from-brand-600 to-brand-500 text-white font-bold text-base rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-brand-500/30 hover:shadow-xl hover:shadow-brand-500/40 hover:-translate-y-0.5 transition-all"
+                    >
+                      <CheckCircle2 className="w-5 h-5" />
+                      Confirm Beneficiary
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
-            <div className="flex justify-end pt-6 border-t border-slate-200/60">
+            <div className="flex justify-end pt-6 border-t border-slate-200/60 mt-6">
               <button 
                 onClick={() => setCurrentStep(2)} 
                 disabled={!selectedBene}
@@ -512,8 +686,14 @@ export default function ImportPaymentWizard() {
                   </div>
                   <div className="flex justify-between text-base items-center">
                     <span className="text-slate-500 font-medium">Bank</span>
-                    <span className="font-bold text-slate-900">{selectedBene?.country} Bank</span>
+                    <span className="font-bold text-slate-900">{selectedBene?.bank || `${selectedBene?.country} Bank`}</span>
                   </div>
+                  {selectedBene?.swift && (
+                    <div className="flex justify-between text-base items-center">
+                      <span className="text-slate-500 font-medium">SWIFT / BIC</span>
+                      <span className="font-mono font-bold text-slate-900">{selectedBene.swift}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-base">
                     <span className="text-slate-500 font-medium">Fee Breakdown</span>
                     <div className="text-right">
