@@ -7,6 +7,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import logoImg from '../../../public/logo.png';
 import { MockProvider } from '@/lib/MockContext';
 import ToastContainer from '@/components/ToastContainer';
 import TopBar from '@/components/TopBar';
@@ -40,7 +41,7 @@ export default function DashboardLayout({
           {/* Logo Area */}
           <div className="h-20 flex items-center px-6 justify-start border-b border-slate-200 relative group cursor-pointer" onClick={() => router.push('/dashboard')}>
               <Image
-                src="/logo.png"
+                src={logoImg}
                 alt="FrontierPay"
                 width={140}
                 height={36}

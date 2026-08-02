@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Image from 'next/image';
+import logoImg from '../../../../public/logo.png';
 import { ArrowRight, Loader2, Key } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -30,7 +31,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-8">
           <Link href="/" className="flex items-center justify-center">
             <Image
-              src="/logo.png"
+              src={logoImg}
               alt="FrontierPay"
               width={200}
               height={50}

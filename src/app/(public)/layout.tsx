@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import logoImg from "../../../public/logo.png";
 import { ArrowRight, MessageCircle, Globe, Mail } from "lucide-react";
 
 export default function PublicLayout({
@@ -16,7 +17,7 @@ export default function PublicLayout({
           
           <Link href="/" className="flex items-center group">
             <Image
-              src="/logo.png"
+              src={logoImg}
               alt="FrontierPay"
               width={160}
               height={40}
@@ -60,7 +61,7 @@ export default function PublicLayout({
             <div className="col-span-2 lg:col-span-2">
               <Link href="/" className="flex items-center mb-6">
                 <Image
-                  src="/logo.png"
+                  src={logoImg}
                   alt="FrontierPay"
                   width={140}
                   height={36}
