@@ -79,7 +79,7 @@ export default function WalletsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
         
         {/* INR WALLET */}
-        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-brand-500/20"></div>
           
           <div className="flex justify-between items-start mb-10 relative z-10">
@@ -108,7 +108,7 @@ export default function WalletsPage() {
         </div>
 
         {/* USD WALLET */}
-        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-emerald-500/20"></div>
           
           <div className="flex justify-between items-start mb-10 relative z-10">
@@ -139,7 +139,7 @@ export default function WalletsPage() {
         </div>
 
         {/* SGD WALLET */}
-        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-amber-500/20"></div>
           
           <div className="flex justify-between items-start mb-10 relative z-10">
@@ -161,6 +161,68 @@ export default function WalletsPage() {
           
           <div className="flex gap-4 relative z-10">
              <button onClick={() => { setFromCurrency('SGD'); setActiveModal('convert'); }} className="flex-1 py-4 bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <RefreshCcw className="w-5 h-5" /> Convert to INR
+            </button>
+            <button onClick={() => addToast('Feature Coming Soon', '', 'info')} className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <ArrowDownLeft className="w-5 h-5" /> Receive
+            </button>
+          </div>
+        </div>
+
+        {/* EUR WALLET */}
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-blue-500/20"></div>
+          
+          <div className="flex justify-between items-start mb-10 relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold border border-blue-100 shadow-inner">€</div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">Euro</h3>
+                <span className="inline-block mt-1 bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">SEPA Instant</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative z-10 mb-10">
+            <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">{formatCurrency(balances.EUR, 'EUR')}</h2>
+            <p className="text-sm font-medium text-slate-500 bg-slate-50 inline-block px-4 py-2 rounded-lg border border-slate-200">
+               ~₹{(balances.EUR * (fxRates['INR'] || 83.5) / (fxRates['EUR'] || 0.92)).toLocaleString('en-IN', {maximumFractionDigits: 2})} at current rate
+            </p>
+          </div>
+          
+          <div className="flex gap-4 relative z-10">
+             <button onClick={() => { setFromCurrency('EUR'); setActiveModal('convert'); }} className="flex-1 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <RefreshCcw className="w-5 h-5" /> Convert to INR
+            </button>
+            <button onClick={() => addToast('Feature Coming Soon', '', 'info')} className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <ArrowDownLeft className="w-5 h-5" /> Receive
+            </button>
+          </div>
+        </div>
+
+        {/* GBP WALLET */}
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-purple-500/20"></div>
+          
+          <div className="flex justify-between items-start mb-10 relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold border border-purple-100 shadow-inner">£</div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">British Pound</h3>
+                <span className="inline-block mt-1 bg-purple-100 text-purple-700 border border-purple-200 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest shadow-sm">UK Faster Payments</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative z-10 mb-10">
+            <h2 className="text-4xl font-mono font-bold text-slate-900 tracking-tight mb-2">{formatCurrency(balances.GBP, 'GBP')}</h2>
+            <p className="text-sm font-medium text-slate-500 bg-slate-50 inline-block px-4 py-2 rounded-lg border border-slate-200">
+               ~₹{(balances.GBP * (fxRates['INR'] || 83.5) / (fxRates['GBP'] || 0.79)).toLocaleString('en-IN', {maximumFractionDigits: 2})} at current rate
+            </p>
+          </div>
+          
+          <div className="flex gap-4 relative z-10">
+             <button onClick={() => { setFromCurrency('GBP'); setActiveModal('convert'); }} className="flex-1 py-4 bg-purple-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-purple-500/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
               <RefreshCcw className="w-5 h-5" /> Convert to INR
             </button>
             <button onClick={() => addToast('Feature Coming Soon', '', 'info')} className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
@@ -199,7 +261,7 @@ export default function WalletsPage() {
              </div>
              <div>
                <p className="text-sm font-bold text-slate-900">Send to HDFC Bank</p>
-               <p className="text-xs font-medium text-slate-500 mt-1">Available: ₹{balances.INR.toLocaleString()}</p>
+               <p className="text-xs font-medium text-slate-500 mt-1">Available: ₹{balances.INR.toLocaleString('en-IN')}</p>
              </div>
           </div>
           <div>

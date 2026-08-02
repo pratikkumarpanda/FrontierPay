@@ -68,7 +68,7 @@ export default function FinancingPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         
         {/* Invoice Financing Card */}
-        <div className="glass-panel p-10 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+        <div className="p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-indigo-500/20"></div>
           <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 group-hover:scale-110 transition-all duration-500">
             <Zap className="w-32 h-32 text-indigo-600 fill-current" />
@@ -102,7 +102,7 @@ export default function FinancingPage() {
         </div>
 
         {/* Pay Later Card */}
-        <div className="glass-panel p-10 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white relative overflow-hidden group">
+        <div className="p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-all group-hover:bg-emerald-500/20"></div>
           <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 group-hover:-rotate-12 transition-all duration-500">
             <History className="w-32 h-32 text-emerald-600" />

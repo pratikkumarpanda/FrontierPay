@@ -72,7 +72,7 @@ export default function SettingsPage() {
 
         {/* Content Area */}
         <div className="flex-1">
-          <div className="glass-panel p-10 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white min-h-[600px]">
+          <div className="p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 min-h-[600px]">
             
             {/* PROFILE TAB */}
             {activeTab === 'profile' && (

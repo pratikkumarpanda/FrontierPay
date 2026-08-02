@@ -30,7 +30,7 @@ export default function FXCalculatorPage() {
       </header>
 
       <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div className="glass-panel" style={{ padding: '32px' }}>
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60">
           
           <div className="flex items-center gap-4 mb-6">
             <div className="form-group" style={{ flex: 1 }}>

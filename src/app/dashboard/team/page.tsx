@@ -38,7 +38,7 @@ export default function TeamPage() {
         </button>
       </header>
 
-      <div className="glass-panel" style={{ overflow: 'hidden' }}>
+      <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 overflow-hidden">
         <table className="data-table">
           <thead>
             <tr>

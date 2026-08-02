@@ -65,7 +65,7 @@ export default function CounterpartiesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCounterparties.map(cp => (
-           <div key={cp.id} className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-lg shadow-slate-200/50 border border-white hover:border-brand-300 hover:shadow-xl transition-all group relative overflow-hidden">
+           <div key={cp.id} className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-lg shadow-slate-200/50 border border-white/60 hover:border-brand-300 hover:shadow-xl transition-all group relative overflow-hidden">
              <div className="absolute top-0 right-0 p-6">
                 <button className="text-slate-400 hover:text-brand-600 transition-colors p-2 rounded-full hover:bg-brand-50">
                   <MoreVertical className="w-5 h-5" />
@@ -93,7 +93,7 @@ export default function CounterpartiesPage() {
       </div>
       
       {filteredCounterparties.length === 0 && (
-         <div className="p-20 text-center glass-panel rounded-[2rem] bg-white/80 border border-white shadow-sm mt-8">
+         <div className="p-20 text-center rounded-[2rem] bg-white/60 backdrop-blur-xl border border-white/60 shadow-sm mt-8">
             <Building2 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <p className="text-xl font-bold text-slate-500">No counterparties found.</p>
          </div>

@@ -56,7 +56,7 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         
         {/* Account Statement */}
-        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white hover:border-brand-300 transition-all group relative overflow-hidden flex flex-col h-full hover:shadow-2xl hover:-translate-y-1">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 hover:border-brand-300 transition-all group relative overflow-hidden flex flex-col h-full hover:shadow-2xl hover:-translate-y-1">
           <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none group-hover:bg-brand-500/20 transition-all"></div>
           
           <div className="w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100 shadow-inner mb-6 relative z-10 group-hover:scale-110 transition-transform">
@@ -74,7 +74,7 @@ export default function ReportsPage() {
         </div>
 
         {/* FIRC Certificates */}
-        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white hover:border-emerald-300 transition-all group relative overflow-hidden flex flex-col h-full hover:shadow-2xl hover:-translate-y-1">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 hover:border-emerald-300 transition-all group relative overflow-hidden flex flex-col h-full hover:shadow-2xl hover:-translate-y-1">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none group-hover:bg-emerald-500/20 transition-all"></div>
           
           <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-inner mb-6 relative z-10 group-hover:scale-110 transition-transform">
@@ -92,7 +92,7 @@ export default function ReportsPage() {
         </div>
 
         {/* 15CA/15CB */}
-        <div className="glass-panel p-8 rounded-[2rem] bg-white/80 shadow-xl shadow-slate-200/50 border border-white hover:border-amber-300 transition-all group relative overflow-hidden flex flex-col h-full hover:shadow-2xl hover:-translate-y-1">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 hover:border-amber-300 transition-all group relative overflow-hidden flex flex-col h-full hover:shadow-2xl hover:-translate-y-1">
           <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none group-hover:bg-amber-500/20 transition-all"></div>
           
           <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shadow-inner mb-6 relative z-10 group-hover:scale-110 transition-transform">

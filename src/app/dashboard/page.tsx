@@ -27,7 +27,7 @@ export default function DashboardHome() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div className="glass-panel p-6 rounded-2xl hover:shadow-card-hover transition-shadow relative overflow-hidden group">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 hover:shadow-2xl transition-shadow relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform">
             <Activity className="w-24 h-24 text-brand-600" />
           </div>
@@ -45,7 +45,7 @@ export default function DashboardHome() {
           </div>
         </div>
 
-        <div className="glass-panel p-6 rounded-2xl hover:shadow-card-hover transition-shadow relative overflow-hidden group">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 hover:shadow-2xl transition-shadow relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform">
             <DollarSign className="w-24 h-24 text-emerald-600" />
           </div>
@@ -63,7 +63,7 @@ export default function DashboardHome() {
           </div>
         </div>
 
-        <div className="glass-panel p-6 rounded-2xl hover:shadow-card-hover transition-shadow relative overflow-hidden group">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 hover:shadow-2xl transition-shadow relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform">
             <RefreshCcw className="w-24 h-24 text-yellow-600" />
           </div>
@@ -84,7 +84,7 @@ export default function DashboardHome() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-        <div className="glass-panel p-6 rounded-2xl lg:col-span-2">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60 lg:col-span-2">
           <h3 className="text-sm font-bold text-slate-900 mb-6 uppercase tracking-widest">30-Day Cash Flow (INR)</h3>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -113,7 +113,7 @@ export default function DashboardHome() {
           </div>
         </div>
 
-        <div className="glass-panel p-6 rounded-2xl">
+        <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60">
           <h3 className="text-sm font-bold text-slate-900 mb-6 uppercase tracking-widest">Exposure by Currency</h3>
           <div className="h-[250px] w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">

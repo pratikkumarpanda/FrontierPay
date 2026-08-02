@@ -40,7 +40,7 @@ export default function CardsPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
         {cards.map(card => (
-          <div key={card.id} className="glass-panel" style={{ padding: '24px', opacity: card.status === 'Frozen' ? 0.6 : 1, transition: 'opacity 0.3s' }}>
+          <div key={card.id} className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60" style={{ opacity: card.status === 'Frozen' ? 0.6 : 1, transition: 'opacity 0.3s' }}>
             <div className="flex justify-between items-start mb-6">
               <CreditCard size={24} color={card.status === 'Frozen' ? 'var(--text-muted)' : 'var(--primary-blue)'} />
               <span className={`badge ${card.status === 'Frozen' ? 'badge-yellow' : 'badge-green'}`}>{card.status}</span>

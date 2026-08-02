@@ -24,7 +24,7 @@ export default function DevelopersPage() {
         
         {/* Left Column: Config */}
         <div className="flex flex-col gap-6">
-          <div className="glass-panel" style={{ padding: '24px' }}>
+          <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60">
             <h2 className="font-semibold" style={{ fontSize: '18px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Key size={18} className="text-blue" /> Production API Keys
             </h2>
@@ -42,7 +42,7 @@ export default function DevelopersPage() {
             </button>
           </div>
 
-          <div className="glass-panel" style={{ padding: '24px' }}>
+          <div className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/60">
             <h2 className="font-semibold" style={{ fontSize: '18px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <LinkIcon size={18} className="text-green" /> Webhook Endpoints
             </h2>
