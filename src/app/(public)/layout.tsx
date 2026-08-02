@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, MessageCircle, Globe, Mail } from "lucide-react";
 
 export default function PublicLayout({
@@ -14,10 +15,13 @@ export default function PublicLayout({
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
           <Link href="/" className="flex items-center group">
-            <img
+            <Image
               src="/logo.png"
               alt="FrontierPay"
+              width={160}
+              height={40}
               className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+              priority
             />
           </Link>
           
@@ -55,9 +59,11 @@ export default function PublicLayout({
             
             <div className="col-span-2 lg:col-span-2">
               <Link href="/" className="flex items-center mb-6">
-                <img
+                <Image
                   src="/logo.png"
                   alt="FrontierPay"
+                  width={140}
+                  height={36}
                   className="h-9 w-auto object-contain brightness-0 invert"
                 />
               </Link>
