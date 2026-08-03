@@ -73,9 +73,9 @@ export default function Home() {
             <Link href="/login" className="px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 shadow-xl shadow-slate-900/20 transition-all hover:-translate-y-0.5 flex items-center gap-2">
               Open Dashboard <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="/pricing" className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 shadow-sm transition-all hover:-translate-y-0.5">
+            <Link href="/pricing" className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 shadow-sm transition-all hover:-translate-y-0.5">
               View Pricing
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -344,9 +344,9 @@ export default function Home() {
             <Link href="/login" className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl hover:bg-slate-50 shadow-xl transition-all hover:-translate-y-0.5">
               Open Dashboard
             </Link>
-            <a href="/pricing" className="px-8 py-4 bg-slate-800 text-white font-bold rounded-2xl border border-slate-700 hover:bg-slate-700 shadow-sm transition-all hover:-translate-y-0.5">
+            <Link href="/pricing" className="px-8 py-4 bg-slate-800 text-white font-bold rounded-2xl border border-slate-700 hover:bg-slate-700 shadow-sm transition-all hover:-translate-y-0.5">
               View Pricing
-            </a>
+            </Link>
           </div>
         </div>
       </section>
